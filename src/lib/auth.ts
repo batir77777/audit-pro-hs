@@ -1,163 +1,145 @@
-const USERS_KEY = 'sitk_users';
-const SESSION_KEY = 'sitk_session';
-const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
+/**
+ * auth.ts — Step 5: Supabase Auth adapter
+ *
+ * Replaces the previous localStorage/PBKDF2 system.
+ * All exported names and the AuthUser shape are unchanged so the
+ * rest of the app (authContext, mockData, ProtectedRoute, Login) requires
+ * no modifications.
+ *
+ * EMAIL CONFIRMATION:
+ *   Supabase is configured with "Confirm email = ON".
+ *   signUp() returns { needsConfirmation: true } when the account was
+ *   created but the user must click the verification link before they
+ *   can sign in.  authContext surfaces this to Login.tsx via the
+ *   register() promise rejection message so the UI can display it.
+ */
+
+import { supabase } from './supabase';
+
+// ---------- Public types ----------
 
 export interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
+    id: string;
+    name: string;
+    email: string;
 }
 
-interface StoredUser {
-  id: string;
-  name: string;
-  email: string; // always lowercase
-  passwordHash: string; // hex: 32-char salt + 64-char SHA-256 hash
-  createdAt: string;
-}
+// ---------- Session helpers ----------
 
-interface Session {
-  userId: string;
-  name: string;
-  email: string;
-  expiresAt: number;
-}
-
-// ---------- Crypto helpers ----------
-
-function toHex(buf: Uint8Array): string {
-  return Array.from(buf)
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
-}
-
-function fromHex(hex: string): Uint8Array {
-  const arr = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < arr.length; i++) {
-    arr[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
-  }
-  return arr;
-}
-
-async function deriveKey(password: string, salt: Uint8Array): Promise<ArrayBuffer> {
-  const keyMaterial = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(password),
-    'PBKDF2',
-    false,
-    ['deriveBits']
-  );
-  return crypto.subtle.deriveBits(
-    { name: 'PBKDF2', salt, iterations: 100_000, hash: 'SHA-256' },
-    keyMaterial,
-    256
-  );
-}
-
-async function hashPassword(password: string): Promise<string> {
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const hash = await deriveKey(password, salt);
-  return toHex(salt) + toHex(new Uint8Array(hash));
-}
-
-async function verifyPassword(password: string, stored: string): Promise<boolean> {
-  const salt = fromHex(stored.slice(0, 32)); // 16 bytes = 32 hex chars
-  const storedHash = stored.slice(32);
-  const hash = await deriveKey(password, salt);
-  return toHex(new Uint8Array(hash)) === storedHash;
-}
-
-// ---------- User storage ----------
-
-function getStoredUsers(): StoredUser[] {
-  try {
-    const raw = localStorage.getItem(USERS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function persistUsers(users: StoredUser[]): void {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
-// ---------- Session ----------
-
+/**
+ * Returns the current user synchronously from the Supabase session cache.
+ * Supabase-js keeps the session in localStorage automatically — no manual
+ * session management needed.
+ */
 export function getSession(): AuthUser | null {
+    // supabase.auth.getSession() is async, but the *cached* value is
+  // available synchronously via the internal storage key.  We use the
+  // low-level approach so this function stays sync (same contract as before).
   try {
-    const raw = localStorage.getItem(SESSION_KEY);
-    if (!raw) return null;
-    const session: Session = JSON.parse(raw);
-    if (Date.now() > session.expiresAt) {
-      localStorage.removeItem(SESSION_KEY);
-      return null;
-    }
-    return { id: session.userId, name: session.name, email: session.email };
+        const raw = localStorage.getItem(
+                `sb-${import.meta.env.VITE_SUPABASE_URL?.split('//')[1]?.split('.')[0]}-auth-token`
+              );
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        const sbUser = parsed?.user;
+        if (!sbUser) return null;
+        return {
+                id: sbUser.id,
+                name: sbUser.user_metadata?.name ?? sbUser.email ?? '',
+                email: sbUser.email ?? '',
+        };
   } catch {
-    return null;
+        return null;
   }
 }
 
-function createSession(user: StoredUser): AuthUser {
-  const session: Session = {
-    userId: user.id,
-    name: user.name,
-    email: user.email,
-    expiresAt: Date.now() + SESSION_DURATION_MS,
-  };
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-  return { id: user.id, name: user.name, email: user.email };
-}
-
+/** Clears the Supabase session (sign out). */
 export function clearSession(): void {
-  localStorage.removeItem(SESSION_KEY);
+    // Fire-and-forget; authContext also calls supabase.auth.signOut()
+  supabase.auth.signOut().catch(() => {});
 }
 
-/** Returns the current user's id or null — used outside of React (e.g. mockData.ts). */
+/** Returns the current user's id or null — used outside React (e.g. mockData.ts). */
 export function getCurrentUserId(): string | null {
-  return getSession()?.id ?? null;
+    return getSession()?.id ?? null;
 }
 
 // ---------- Auth operations ----------
 
-export async function signUp(
-  name: string,
-  email: string,
-  password: string
-): Promise<AuthUser> {
-  const normalEmail = email.toLowerCase().trim();
-  const users = getStoredUsers();
+/**
+ * Sign in with email + password via Supabase Auth.
+ * Throws a user-friendly message on failure.
+ */
+export async function signIn(email: string, password: string): Promise<AuthUser> {
+    const { data, error } = await supabase.auth.signInWithPassword({
+          email: email.toLowerCase().trim(),
+          password,
+    });
 
-  if (users.some(u => u.email === normalEmail)) {
-    throw new Error('An account with this email already exists.');
+  if (error) {
+        // Map Supabase error codes to friendly messages
+      if (error.message.toLowerCase().includes('invalid login')) {
+              throw new Error('Invalid email or password.');
+      }
+        if (error.message.toLowerCase().includes('email not confirmed')) {
+                throw new Error(
+                          'Please confirm your email address first. Check your inbox for a verification link.'
+                        );
+        }
+        throw new Error(error.message);
   }
 
-  const passwordHash = await hashPassword(password);
-  const newUser: StoredUser = {
-    id: crypto.randomUUID(),
-    name: name.trim(),
-    email: normalEmail,
-    passwordHash,
-    createdAt: new Date().toISOString(),
-  };
+  const user = data.user;
+    if (!user) throw new Error('Sign in failed. Please try again.');
 
-  persistUsers([...users, newUser]);
-  return createSession(newUser);
+  return {
+        id: user.id,
+        name: user.user_metadata?.name ?? user.email ?? '',
+        email: user.email ?? '',
+  };
 }
 
-export async function signIn(email: string, password: string): Promise<AuthUser> {
-  const normalEmail = email.toLowerCase().trim();
-  const users = getStoredUsers();
-  const user = users.find(u => u.email === normalEmail);
+/**
+ * Register a new account via Supabase Auth.
+ *
+ * Because "Confirm email" is ON in Supabase, the account is created but
+ * the user cannot sign in until they click the verification email.
+ * In that case this function throws with a clear message so the UI
+ * can show a "Check your inbox" notice instead of navigating to dashboard.
+ */
+export async function signUp(
+    name: string,
+    email: string,
+    password: string
+  ): Promise<AuthUser> {
+    const { data, error } = await supabase.auth.signUp({
+          email: email.toLowerCase().trim(),
+          password,
+          options: {
+                  data: { name: name.trim() },
+          },
+    });
 
-  // Always run verifyPassword to avoid timing-based user enumeration
-  const hashToCheck = user?.passwordHash ?? 'a'.repeat(96);
-  const valid = user ? await verifyPassword(password, hashToCheck) : false;
-
-  if (!user || !valid) {
-    throw new Error('Invalid email or password.');
+  if (error) {
+        if (error.message.toLowerCase().includes('already registered')) {
+                throw new Error('An account with this email already exists.');
+        }
+        throw new Error(error.message);
   }
 
-  return createSession(user);
+  // session is null when email confirmation is required
+  if (!data.session) {
+        throw new Error(
+                'CONFIRM_EMAIL:Account created! Please check your email and click the ' +
+                  'verification link before signing in.'
+              );
+  }
+
+  // session exists only when confirmation is disabled — immediate login
+  const user = data.user!;
+    return {
+          id: user.id,
+          name: user.user_metadata?.name ?? user.email ?? '',
+          email: user.email ?? '',
+    };
 }
