@@ -1,5 +1,6 @@
 import { User, Company, Report, Activity } from '../types';
 import { getCurrentUserId, getSession } from './auth';
+import { syncReportToSupabase } from './reportService';
 
 export const mockUser: User = {
   id: 'u1',
@@ -214,6 +215,7 @@ export const saveReport = (report: Report) => {
   try {
     persist(updated);
     console.log('[saveReport] Saved successfully:', reportToSave.id);
+        syncReportToSupabase(reportToSave); // Step 4: background Supabase sync
   } catch {
     // Quota exceeded — retry without embedded photos in all reports
     console.warn('[saveReport] Storage quota exceeded — retrying without photos');
