@@ -4,7 +4,7 @@
  * Changes from original:
  *  - Added useEffect with supabase.auth.onAuthStateChange so React state
  *    stays in sync with the Supabase session (token refresh, sign-out in
- *    another tab, etc.).
+ *    another tab, etc.).h
  *  - register() catches the CONFIRM_EMAIL: sentinel thrown by signUp()
  *    and re-throws a clean message the Login form can display.
  *  - All exported names, the AuthUser shape, and the context interface
