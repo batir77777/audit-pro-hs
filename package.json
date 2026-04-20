@@ -12,7 +12,8 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@base-ui/react": "^1.4.0",
+        "@supabase/supabase-js": "^2.49.4",
+        "@base-ui/react": "^1.4.0",
     "@fontsource-variable/geist": "^5.2.8",
     "@google/genai": "^1.29.0",
     "@radix-ui/react-tooltip": "^1.2.8",
