@@ -39,6 +39,7 @@ import {
   TabsTrigger 
 } from '@/components/ui/tabs';
 import { mockReports, getStoredReports, getReportById, softDeleteReport, restoreReport, permanentDeleteReport } from '@/lib/mockData';
+import { mergeSupabaseReportsToLocal } from '@/lib/reportService';
 import { exportSavedReportToPDF, exportSavedReportToWord } from '@/lib/exportUtils';
 import { preloadDraftForEdit } from '@/lib/useAutoSave';
 import { useBranding } from '@/lib/brandingContext';
@@ -189,6 +190,10 @@ export default function MyReports() {
     window.addEventListener('reportsUpdated', handleUpdate);
     return () => window.removeEventListener('reportsUpdated', handleUpdate);
   }, []);
+
+    React.useEffect(() => {
+          mergeSupabaseReportsToLocal();
+            }, []);
 
   const filteredReports = reports.filter(report => {
     const q = searchQuery.toLowerCase();
