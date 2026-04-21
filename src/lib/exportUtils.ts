@@ -150,7 +150,7 @@ export const exportToPDF = async (elementId: string, fileName: string, branding:
 
 export const exportToWord = async (title: string, data: any, fileName: string, branding: BrandingSettings = DEFAULT_BRANDING) => {
   const WORD_SKIP = new Set(['id', 'authorId', 'type', 'data', 'photos',
-    'templateId', 'signature', 'completedBySign']);
+    'templateId']);
 
   /** Format a value for Word output: booleans → Yes/No, ISO dates → DD/MM/YYYY, sanitises placeholders, else String.
    *  Never returns [object Object] — arrays and plain objects return '' (global safeguard). */
@@ -326,8 +326,7 @@ export const exportToWord = async (title: string, data: any, fileName: string, b
 
   // ── Executive Summary (rendered prominently before all other body fields) ─
   const execSummaryWord: string = wordVal(
-    body.executiveSummary ?? data.executiveSummary ??
-    body.overallComments  ?? data.overallComments  ?? ''
+    body.executiveSummary ?? data.executiveSummary ?? ''
   );
   if (execSummaryWord) {
     sections.push(
@@ -771,8 +770,6 @@ const SKIP_KEYS = new Set([
   'overallScore', 'maxPoints', 'actualPoints', 'rating',
   // internal routing/template keys — not user-facing data
   'templateId',
-  // drawn/base64 signatures stored at top level
-  'signature', 'completedBySign',
 ]);
 
 /** Build a clean "Type - Location - Date" filename (sanitised for filesystem). */
@@ -1113,7 +1110,7 @@ export const exportSavedReportToPDF = async (
 
   // ── Executive Summary (rendered prominently before all other fields) ─────
   const execSummaryText: string = displayVal(
-    allData.executiveSummary ?? allData.overallComments ?? ''
+    allData.executiveSummary ?? ''
   );
   if (execSummaryText) {
     sectionHeading('Executive Summary');
