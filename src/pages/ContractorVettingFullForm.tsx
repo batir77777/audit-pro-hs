@@ -171,7 +171,7 @@ export default function ContractorVettingFullForm() {
       const newReport: ContractorVettingReport = {
         id: editId ?? `r${Date.now()}`,
         title: `Contractor Vetting - ${formData.companyName || 'New Contractor'}`,
-        type: 'Contractor Vetting 10-001',
+        type: 'Contractor Vetting Form',
         status: status,
         location: formData.address || 'Not Specified',
         date: new Date().toISOString().split('T')[0],
@@ -262,7 +262,7 @@ export default function ContractorVettingFullForm() {
       </div>
 
       <div className="space-y-3">
-        <h1 className="text-3xl font-black uppercase tracking-tight text-slate-900 leading-none">10-001 Contractors/Sub-Contractors Vetting Form</h1>
+        <h1 className="text-3xl font-black uppercase tracking-tight text-slate-900 leading-none">Contractor Vetting Form</h1>
         <div className="flex items-center gap-3">
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Safety is the Key Ltd • Contractor Management</p>
           <div className="h-px w-12 bg-slate-200" />
