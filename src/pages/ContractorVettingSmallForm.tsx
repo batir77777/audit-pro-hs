@@ -150,7 +150,7 @@ export default function ContractorVettingSmallForm() {
       const newReport: ContractorVettingReport = {
         id: editId ?? `r${Date.now()}`,
         title: `Contractor Vetting (Small) - ${formData.companyName || 'New Contractor'}`,
-        type: 'Contractor Vetting 10-002',
+        type: 'Contractor Vetting Form (Small)',
         status: status,
         location: formData.address || 'Not Specified',
         date: new Date().toISOString().split('T')[0],
@@ -242,7 +242,7 @@ export default function ContractorVettingSmallForm() {
       </div>
 
       <div className="space-y-3">
-        <h1 className="text-3xl font-black uppercase tracking-tight text-slate-900 leading-none">10-002 Smaller Contractors/Sub-Contractors Vetting Form</h1>
+        <h1 className="text-3xl font-black uppercase tracking-tight text-slate-900 leading-none">Contractor Vetting Form (Small)</h1>
         <div className="flex items-center gap-3">
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Safety is the Key Ltd • Contractor Management</p>
           <div className="h-px w-12 bg-slate-200" />
