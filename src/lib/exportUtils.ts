@@ -154,23 +154,7 @@ export const exportToWord = async (title: string, data: any, fileName: string, b
 
   /** Format a value for Word output: booleans → Yes/No, ISO dates → DD/MM/YYYY, sanitises placeholders, else String.
    *  Never returns [object Object] — arrays and plain objects return '' (global safeguard). */
-  const wordVal = (v: any): string => {
-    if (v === null || v === undefined) return '';
-    if (typeof v === 'boolean') return v ? 'Yes' : 'No';
-    if (typeof v === 'string') {
-      if (['undefined','null','unknown'].includes(v.trim().toLowerCase())) return '';
-      // Base64 data URLs (drawn signatures) — show as a clean label
-      if (v.startsWith('data:image/')) return '\u2713 Signed';
-      if (/^\d{4}-\d{2}-\d{2}/.test(v)) {
-        const p = v.split('T')[0].split('-');
-        return `${p[2]}/${p[1]}/${p[0]}`;
-      }
-      return v;
-    }
-    // Global safeguard: never render raw objects or arrays as strings
-    if (Array.isArray(v) || (typeof v === 'object' && v !== null)) return '';
-    return String(v);
-  };
+  // wordVal: module-level function defined below (shared with PDF exporter)
 
   const WORD_ACRONYMS = ['dse','ppe','coshh','riddor','wfh','cctv','gdpr','nhs','hse','ra','ptw','id','ref'];
   const wordLabel = (key: string): string => {
@@ -411,7 +395,7 @@ export const exportToWord = async (title: string, data: any, fileName: string, b
               const nHeaders0 = Object.keys(nestedItems[0]).filter(h => !WORD_SKIP_NESTED.has(h));
               const answerKey = nHeaders0.includes('answer') ? 'answer'
                 : nHeaders0.includes('score') ? 'score' : null;
-              const qKeyN = nHeaders0.find((h: string) => ['question', 'item', 'label'].includes(h));
+              const qKeyN = nHeaders0.find((h: string) => ['question', 'item', 'label', 'riskFactor'].includes(h));
               const isNestedChecklist = !!qKeyN && !!answerKey;
 
               let nHeaders: string[];
@@ -481,7 +465,7 @@ export const exportToWord = async (title: string, data: any, fileName: string, b
 
           // ── Standard checklist / table rendering ────────────────────────────
           // Detect checklist pattern: question/item/label + answer columns
-          const qKey = rawHeaders.find(h => ['question', 'item', 'label'].includes(h));
+          const qKey = rawHeaders.find(h => ['question', 'item', 'label', 'riskFactor'].includes(h));
           const stdAnswerKey = rawHeaders.includes('answer') ? 'answer'
             : rawHeaders.includes('score') ? 'score' : null;
           const isChecklist = !!qKey && !!stdAnswerKey;
@@ -878,6 +862,25 @@ function humanLabel(key: string): string {
 /** Sentinel strings that should not appear in output. */
 const PLACEHOLDER_STRINGS = new Set(['undefined', 'null', 'unknown']);
 
+/** Format a raw value for Word output. Booleans → Yes/No, ISO dates → DD/MM/YYYY,
+ *  signatures → '✓ Signed', sanitises undefined/null/unknown placeholders.
+ *  Never returns [object Object] — arrays and plain objects return '' (shared by PDF + Word). */
+function wordVal(v: any): string {
+  if (v === null || v === undefined) return '';
+  if (typeof v === 'boolean') return v ? 'Yes' : 'No';
+  if (typeof v === 'string') {
+    if (['undefined','null','unknown'].includes(v.trim().toLowerCase())) return '';
+    if (v.startsWith('data:image/')) return '\u2713 Signed';
+    if (/^\d{4}-\d{2}-\d{2}/.test(v)) {
+      const p = v.split('T')[0].split('-');
+      return `${p[2]}/${p[1]}/${p[0]}`;
+    }
+    return v;
+  }
+  if (Array.isArray(v) || (typeof v === 'object' && v !== null)) return '';
+  return String(v);
+}
+
 /** Format a raw value for PDF display. Sanitises bad values, converts ISO dates.
  *  Never returns [object Object] — arrays and plain objects return '' (global safeguard). */
 function displayVal(v: any): string {
@@ -1189,7 +1192,7 @@ export const exportSavedReportToPDF = async (
             const nHeaders0 = Object.keys(nestedItems[0]).filter(h => !SKIP_NESTED_COLS.has(h));
             const answerKey = nHeaders0.includes('answer') ? 'answer'
               : nHeaders0.includes('score') ? 'score' : null;
-            const qKeyN = nHeaders0.find((h: string) => ['question', 'item', 'label'].includes(h));
+            const qKeyN = nHeaders0.find((h: string) => ['question', 'item', 'label', 'riskFactor'].includes(h));
             const isNestedChecklist = !!qKeyN && !!answerKey;
 
             let nHeaders: string[];
@@ -1286,7 +1289,7 @@ export const exportSavedReportToPDF = async (
 
         // ── Standard checklist / table rendering ────────────────────────────
         // Detect checklist pattern: question/item/label + answer columns
-        const qKeyStd = rawHeaders.find(h => ['question', 'item', 'label'].includes(h));
+        const qKeyStd = rawHeaders.find(h => ['question', 'item', 'label', 'riskFactor'].includes(h));
         const pdfAnswerKey = rawHeaders.includes('answer') ? 'answer'
           : rawHeaders.includes('score') ? 'score' : null;
         const isChecklist = !!qKeyStd && !!pdfAnswerKey;
