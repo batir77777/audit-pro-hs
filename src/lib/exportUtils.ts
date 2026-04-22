@@ -421,7 +421,8 @@ export const exportToWord = async (title: string, data: any, fileName: string, b
                 nColPcts  = commentKey ? [58, 17, 25] : [72, 28];
               } else {
                 nHeaders  = nHeaders0.filter(h => !Array.isArray(nestedItems[0][h]) && typeof nestedItems[0][h] !== 'object');
-                nColPcts  = nHeaders.map(() => Math.floor(100 / Math.max(nHeaders.length, 1)));
+                // Smart widths: wider col for long-text first columns
+                nColPcts = (() => { const lk=['description','hazard','action','observation','details','task','finding','issue']; const f=lk.some(k=>nHeaders[0]?.toLowerCase().includes(k)); return f&&nHeaders.length===2?[65,35]:f&&nHeaders.length===3?[55,23,22]:nHeaders.map(()=>Math.floor(100/Math.max(nHeaders.length,1))); })();
               }
 
               if (nHeaders.length === 0) return;
@@ -478,7 +479,9 @@ export const exportToWord = async (title: string, data: any, fileName: string, b
           // ── Standard checklist / table rendering ────────────────────────────
           // Detect checklist pattern: question/item/label + answer columns
           const qKey = rawHeaders.find(h => ['question', 'item', 'label'].includes(h));
-          const isChecklist = !!qKey && rawHeaders.includes('answer');
+          const stdAnswerKey = rawHeaders.includes('answer') ? 'answer'
+            : rawHeaders.includes('score') ? 'score' : null;
+          const isChecklist = !!qKey && !!stdAnswerKey;
           let headers: string[];
           let colPcts: number[];
           let commentKey: string | null = null;
@@ -486,12 +489,13 @@ export const exportToWord = async (title: string, data: any, fileName: string, b
             commentKey = rawHeaders.includes('comment') ? 'comment'
               : rawHeaders.includes('notes') ? 'notes'
               : rawHeaders.includes('comments') ? 'comments' : null;
-            headers = [qKey!, 'answer', ...(commentKey ? [commentKey] : [])];
+            headers = [qKey!, stdAnswerKey!, ...(commentKey ? [commentKey] : [])];
             colPcts = commentKey ? [58, 17, 25] : [72, 28];
           } else {
             // Only include scalar columns — skip nested arrays/objects
             headers = rawHeaders.filter(h => !Array.isArray(value[0][h]) && typeof value[0][h] !== 'object');
-            colPcts = headers.map(() => Math.floor(100 / Math.max(headers.length, 1)));
+            // Smart widths: wider col for long-text first columns
+            colPcts = (() => { const lk=['description','hazard','action','observation','details','task','finding','issue']; const f=lk.some(k=>headers[0]?.toLowerCase().includes(k)); return f&&headers.length===2?[65,35]:f&&headers.length===3?[55,23,22]:headers.map(()=>Math.floor(100/Math.max(headers.length,1))); })();
           }
 
           if (headers.length === 0) return; // nothing scalar to render
@@ -521,10 +525,10 @@ export const exportToWord = async (title: string, data: any, fileName: string, b
                   const rawVal = wordVal(item[h] ?? '');
                   // For answer column: if empty, promote notes/comment value; fallback N/A
                   // For notes/comment column: clear if its value was promoted to answer
-                  const answerRaw = isChecklist ? wordVal(item['answer'] ?? '') : '';
+                  const answerRaw = isChecklist ? wordVal(item[stdAnswerKey!] ?? '') : '';
                   const notesRaw  = isChecklist && commentKey ? wordVal(item[commentKey] ?? '') : '';
                   let cellText: string;
-                  if (isChecklist && h === 'answer') {
+                  if (isChecklist && h === stdAnswerKey) {
                     cellText = answerRaw || notesRaw || 'N/A';
                   } else if (isChecklist && h === commentKey && !answerRaw && notesRaw) {
                     cellText = ''; // value promoted to answer column — suppress here
@@ -532,7 +536,7 @@ export const exportToWord = async (title: string, data: any, fileName: string, b
                     cellText = rawVal;
                   }
                   let shadeFill = ri % 2 === 0 ? 'FFFFFF' : 'F6F7FA';
-                  if (h === 'answer' && cellText && cellText !== 'N/A') {
+                  if (h === stdAnswerKey && cellText && cellText !== 'N/A') {
                     const lc = cellText.toLowerCase();
                     if (lc === 'yes') shadeFill = 'D7F5D7';
                     else if (lc === 'no') shadeFill = 'FAD8D8';
@@ -544,7 +548,7 @@ export const exportToWord = async (title: string, data: any, fileName: string, b
                       children: [new TextRun({
                         text: cellText,
                         size: 18,
-                        bold: h === 'answer'
+                        bold: h === stdAnswerKey
                       })]
                     })],
                     shading: { fill: shadeFill, type: ShadingType.CLEAR },
@@ -1197,7 +1201,8 @@ export const exportSavedReportToPDF = async (
                 : [CONTENT_W * 0.73, CONTENT_W * 0.27];
             } else {
               nHeaders   = nHeaders0.filter(h => !Array.isArray(nestedItems[0][h]) && typeof nestedItems[0][h] !== 'object');
-              nColWidths = nHeaders.map(() => CONTENT_W / Math.max(nHeaders.length, 1));
+              // Smart widths: wider col for long-text first columns
+              nColWidths = (() => { const lk=['description','hazard','action','observation','details','task','finding','issue']; const f=lk.some(k=>nHeaders[0]?.toLowerCase().includes(k)); return f&&nHeaders.length===2?[CONTENT_W*0.65,CONTENT_W*0.35]:f&&nHeaders.length===3?[CONTENT_W*0.55,CONTENT_W*0.23,CONTENT_W*0.22]:nHeaders.map(()=>CONTENT_W/Math.max(nHeaders.length,1)); })();
             }
 
             if (nHeaders.length === 0) return;
@@ -1279,7 +1284,9 @@ export const exportSavedReportToPDF = async (
         // ── Standard checklist / table rendering ────────────────────────────
         // Detect checklist pattern: question/item/label + answer columns
         const qKeyStd = rawHeaders.find(h => ['question', 'item', 'label'].includes(h));
-        const isChecklist = !!qKeyStd && rawHeaders.includes('answer');
+        const pdfAnswerKey = rawHeaders.includes('answer') ? 'answer'
+          : rawHeaders.includes('score') ? 'score' : null;
+        const isChecklist = !!qKeyStd && !!pdfAnswerKey;
         let headers: string[];
         let colWidths: number[];
         let commentKeyStd: string | null = null;
@@ -1288,14 +1295,15 @@ export const exportSavedReportToPDF = async (
           commentKeyStd = rawHeaders.includes('comment') ? 'comment'
             : rawHeaders.includes('notes') ? 'notes'
             : rawHeaders.includes('comments') ? 'comments' : null;
-          headers   = [qKeyStd!, 'answer', ...(commentKeyStd ? [commentKeyStd] : [])];
+          headers   = [qKeyStd!, pdfAnswerKey!, ...(commentKeyStd ? [commentKeyStd] : [])];
           colWidths = commentKeyStd
             ? [CONTENT_W * 0.56, CONTENT_W * 0.18, CONTENT_W * 0.26]
             : [CONTENT_W * 0.73, CONTENT_W * 0.27];
         } else {
           // Only include scalar columns — skip nested arrays/objects
           headers   = rawHeaders.filter(h => !Array.isArray(value[0][h]) && typeof value[0][h] !== 'object');
-          colWidths = headers.map(() => CONTENT_W / Math.max(headers.length, 1));
+          // Smart widths: wider col for long-text first columns
+          colWidths = (() => { const lk=['description','hazard','action','observation','details','task','finding','issue']; const f=lk.some(k=>headers[0]?.toLowerCase().includes(k)); return f&&headers.length===2?[CONTENT_W*0.65,CONTENT_W*0.35]:f&&headers.length===3?[CONTENT_W*0.55,CONTENT_W*0.23,CONTENT_W*0.22]:headers.map(()=>CONTENT_W/Math.max(headers.length,1)); })();
         }
 
         if (headers.length === 0) { thinRule(); continue; }
@@ -1317,17 +1325,17 @@ export const exportSavedReportToPDF = async (
         // Table data rows
         value.forEach((row, ri) => {
           // Pre-resolve cell values with note→answer promotion
-          const answerRaw = isChecklist ? displayVal(row['answer'] ?? '') : '';
+          const answerRaw = isChecklist ? displayVal(row[pdfAnswerKey!] ?? '') : '';
           const notesRaw  = isChecklist && commentKeyStd ? displayVal(row[commentKeyStd] ?? '') : '';
           const resolveCell = (h: string): string => {
-            if (isChecklist && h === 'answer') {
+            if (isChecklist && h === pdfAnswerKey) {
               return answerRaw || notesRaw || 'N/A'; // promote notes if answer empty; fallback N/A
             }
             if (isChecklist && h === commentKeyStd && !answerRaw && notesRaw) {
               return ''; // value was promoted to answer column — suppress here
             }
             const raw = displayVal(row[h] ?? '');
-            return h === 'answer' && !raw ? 'N/A' : raw;
+            return h === pdfAnswerKey && !raw ? 'N/A' : raw;
           };
 
           // Calculate row height from ALL columns' content
@@ -1353,7 +1361,7 @@ export const exportSavedReportToPDF = async (
             const cellVal = resolveCell(h);
 
             const answerLines = pdf.splitTextToSize(cellVal, colWidths[i] - 5) as string[];
-            const isShortAnswer = h === 'answer' && answerLines.length === 1 && cellVal.length <= 6;
+            const isShortAnswer = h === pdfAnswerKey && answerLines.length === 1 && cellVal.length <= 6;
             if (isShortAnswer) {
               // Short Yes/No/score — color badge centered
               const lc = cellVal.toLowerCase();
@@ -1367,7 +1375,7 @@ export const exportSavedReportToPDF = async (
               pdf.text(cellVal, cx + colWidths[i] / 2, y + rowH / 2 + 2.5, { align: 'center' });
             } else {
               // Long text or non-answer column — wrap and align top-left
-              if (h === 'answer' && cellVal) {
+              if (h === pdfAnswerKey && cellVal) {
                 const lc = cellVal.toLowerCase();
                 if      (lc === 'yes') pdf.setFillColor(210, 244, 210);
                 else if (lc === 'no')  pdf.setFillColor(252, 218, 218);
