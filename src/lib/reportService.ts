@@ -56,24 +56,40 @@ function toSupabasePayload(report: Report, organisationId: string | null) {
           return { reportRow, formPayload };
 }
 
-export async function syncReportToSupabase(report: Report): Promise<void> {
-          try {
-                      const { data: { session } } = await supabase.auth.getSession();
-                      if (!session) return;
-                      const orgId = await getMyOrgId();
-                      const { reportRow, formPayload } = toSupabasePayload(stripPhotos(report), orgId);
-                      const { error: reportError } = await supabase
-                        .from('reports')
-                        .upsert(reportRow, { onConflict: 'id' });
-                      if (reportError) { console.warn('[reportService] upsert report:', reportError.message); return; }
-                      const { error: dataError } = await supabase
-                        .from('report_data')
-                        .upsert({ report_id: reportRow.id, form_data: formPayload }, { onConflict: 'report_id' });
-                      if (dataError) { console.warn('[reportService] upsert report_data:', dataError.message); return; }
-                      console.log('[reportService] Synced to Supabase:', reportRow.id);
-          } catch (err) {
-                      console.warn('[reportService] sync error (non-fatal):', err);
-          }
+export async function syncReportToSupabase(report: Report): Promise<{ ok: boolean; error?: string }> {
+    console.log('[syncReport] Starting sync for report:', report.id, 'authorId:', report.authorId);
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            console.warn('[syncReport] No active session - skipping sync');
+            return { ok: false, error: 'no_session' };
+        }
+        const authUid = session.user.id;
+        if (!authUid) { throw new Error('No authenticated user id - cannot satisfy RLS created_by = auth.uid()'); }
+        console.log('[syncReport] Session OK. auth.uid():', authUid, ' report.authorId:', report.authorId);
+        const orgId = await getMyOrgId();
+        const { reportRow, formPayload } = toSupabasePayload(stripPhotos(report), orgId);
+        reportRow.created_by = authUid; // Always override with live session uid to satisfy RLS
+        // console.log('[syncReport] Upserting report row:', JSON.stringify(reportRow));
+        // const { data: rData, error: reportError } = await supabase
+        // .from('reports').upsert(reportRow, { onConflict: 'id' }).select('id');
+        // if (reportError) {
+        // console.error('[syncReport] REPORTS UPSERT FAILED code:', reportError.code, 'msg:', reportError.message, 'detail:', reportError.details);
+        // throw new Error('reports upsert: ' + reportError.message + ' (code: ' + reportError.code + ')');
+        // }
+        console.log('[syncReport] reports upsert OK:', JSON.stringify(rData));
+        const { data: rdData, error: dataError } = await supabase
+        .from('report_data').upsert({ report_id: reportRow.id, form_data: formPayload }, { onConflict: 'report_id' }).select('report_id');
+        if (dataError) {
+            console.error('[syncReport] REPORT_DATA UPSERT FAILED code:', dataError.code, 'msg:', dataError.message);
+            throw new Error('report_data upsert: ' + dataError.message + ' (code: ' + dataError.code + ')');
+        }
+        console.log('[syncReport] SUCCESS synced to Supabase:', reportRow.id, 'rd:', JSON.stringify(rdData));
+        return { ok: true };
+    } catch (err: any) {
+        console.error('[syncReport] Sync error:', err?.message ?? err);
+        return { ok: false, error: err?.message ?? 'unknown error' };
+    }
 }
 
 export async function fetchReportsFromSupabase(userId: string): Promise<Report[]> {

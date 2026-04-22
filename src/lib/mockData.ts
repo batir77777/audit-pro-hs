@@ -215,7 +215,7 @@ export const saveReport = (report: Report) => {
   try {
     persist(updated);
     console.log('[saveReport] Saved successfully:', reportToSave.id);
-        syncReportToSupabase(reportToSave); // Step 4: background Supabase sync
+        syncReportToSupabase(reportToSave).then((r) => { if (r.ok) { console.log('[saveReport] Supabase sync OK:', reportToSave.id); } else { console.error('[saveReport] Supabase sync FAILED:', reportToSave.id, r.error); } }).catch((e) => { console.error('[saveReport] Supabase sync threw:', e); });
   } catch {
     // Quota exceeded — retry without embedded photos in all reports
     console.warn('[saveReport] Storage quota exceeded — retrying without photos');
