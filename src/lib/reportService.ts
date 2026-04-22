@@ -1,3 +1,4 @@
+// Stage 2A - build trigger
 import { supabase } from './supabase';
 import { Report } from '../types';
 
