@@ -20,14 +20,14 @@ export default function ContractorVettingSelection() {
   const templates = [
     {
       id: '10-001',
-      title: '10-001 Contractors/Sub-Contractors Vetting Form',
+      title: 'Contractor Vetting Form',
       description: 'For contractors or sub-contractors with 5 or more employees, or where the full vetting form is required.',
       icon: Building2,
       color: 'bg-blue-500/10 text-blue-600'
     },
     {
       id: '10-002',
-      title: '10-002 Smaller Contractors/Sub-Contractors Vetting Form',
+      title: 'Contractor Vetting Form (Small)',
       description: 'For smaller or single-person contractors or sub-contractors.',
       icon: User,
       color: 'bg-green-500/10 text-green-600'
