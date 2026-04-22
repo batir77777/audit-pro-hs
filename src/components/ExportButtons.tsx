@@ -1,7 +1,7 @@
 import React from 'react';
 import { FileText, FileDown, Printer, Save, Send, Share2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { exportToPDF, exportToWord, printReport, makeReportFileName } from '@/lib/exportUtils';
+import { exportSavedReportToPDF, exportSavedReportToWord, printReport, makeReportFileName } from '@/lib/exportUtils';
 import { useBranding } from '@/lib/brandingContext';
 import { cn } from '@/lib/utils';
 import type { PhotoAttachment } from '@/types';
@@ -43,9 +43,22 @@ export default function ExportButtons({
     date: reportDate || formData?.date || new Date().toISOString().split('T')[0],
   });
 
+  // Build a SavedReport-compatible object so the structured exporter is used.
+  // This gives form-time exports the same layout as My Reports downloads.
+  const reportObj: Record<string, any> = {
+    id: reportId || '',
+    type: reportType || reportTitle,
+    title: reportTitle,
+    status: formData?.status || 'Draft',
+    date: reportDate || formData?.date || new Date().toISOString().split('T')[0],
+    location: reportLocation || formData?.location || formData?.exactLocation || '',
+    data: { ...formData },
+    photos: photos ?? [],
+  };
+
   const handleShare = () => {
     if (!reportId) return;
-    const shareUrl = `${window.location.origin}/share/${reportId}`;
+    const shareUrl = window.location.origin + '/share/' + reportId;
     navigator.clipboard.writeText(shareUrl);
     setIsShared(true);
     setTimeout(() => setIsShared(false), 2000);
@@ -81,7 +94,7 @@ export default function ExportButtons({
 
       <Button 
         variant="outline"
-        onClick={() => exportToPDF(elementId, fileName, branding)}
+        onClick={() => exportSavedReportToPDF(reportObj, branding)}
         className="h-12 px-6 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-slate-100 hover:bg-sitk-yellow hover:border-sitk-yellow transition-all"
       >
         <FileText className="w-4 h-4 mr-2" /> PDF
@@ -89,7 +102,7 @@ export default function ExportButtons({
 
       <Button 
         variant="outline"
-        onClick={() => exportToWord(reportTitle, { ...formData, photos: photos ?? [] }, fileName, branding)}
+        onClick={() => exportSavedReportToWord(reportObj, branding)}
         className="h-12 px-6 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-slate-100 hover:bg-sitk-yellow hover:border-sitk-yellow transition-all"
       >
         <FileDown className="w-4 h-4 mr-2" /> Word
