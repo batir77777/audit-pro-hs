@@ -172,8 +172,11 @@ export const exportToWord = async (title: string, data: any, fileName: string, b
     return String(v);
   };
 
-  const wordLabel = (key: string) =>
-    key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase()).trim();
+  const WORD_ACRONYMS = ['dse','ppe','coshh','riddor','wfh','cctv','gdpr','nhs','hse','ra','ptw','id','ref'];
+  const wordLabel = (key: string): string => {
+    const result = key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase()).trim();
+    return result.replace(/\b(\w+)\b/g, w => WORD_ACRONYMS.includes(w.toLowerCase()) ? w.toUpperCase() : w);
+  };
 
   const sections: any[] = [];
 
