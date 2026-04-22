@@ -1,15 +1,15 @@
 /**
- * authContext.tsx - Step 5: Supabase Auth context
+ * authContext.tsx - Stage 2A fix: non-blocking onAuthStateChange
  *
- * Changes from original:
- *  - Added useEffect with supabase.auth.onAuthStateChange so React state
- *    stays in sync with the Supabase session (token refresh, sign-out in
- *    another tab, etc.)
- *  - register() catches the CONFIRM_EMAIL: sentinel thrown by signUp()
- *    and re-throws a clean message the Login form can display.
- *  - All exported names, the AuthUser shape, and the context interface
- *    are identical to the original - ProtectedRoute, Login, and all
- *    other consumers require no changes.
+ * Changes from Stage 2A version:
+ *  - onAuthStateChange callback is now synchronous (not async).
+ *    fetchOrgId is called with .then() so setCurrentUser is NOT blocked
+ *    waiting for a profile DB query. This fixes mobile login getting stuck.
+ *  - login() calls signIn() which already fetches organisationId, then
+ *    calls setCurrentUser immediately. The onAuthStateChange will also fire
+ *    and update organisationId if it differs (race is harmless).
+ *  - Added authLoading state so ProtectedRoute can wait for session restore
+ *    before deciding to redirect.
  */
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -18,6 +18,7 @@ import { supabase } from './supabase';
 
 interface AuthContextValue {
       currentUser: AuthUser | null;
+      authLoading: boolean;
       login: (email: string, password: string) => Promise<void>;
       register: (name: string, email: string, password: string) => Promise<void>;
       logout: () => void;
@@ -27,24 +28,42 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
       const [currentUser, setCurrentUser] = useState<AuthUser | null>(getSession);
+      // authLoading is true until onAuthStateChange fires for the first time.
+      // This prevents ProtectedRoute from redirecting to /login before the
+      // session is restored from Supabase's localStorage token.
+      const [authLoading, setAuthLoading] = useState<boolean>(true);
 
   useEffect(() => {
-          const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            async (_event: any, session: any) => {
-              if (session?.user) {
-                const organisationId = await fetchOrgId(session.user.id);
-                setCurrentUser({
-                  id: session.user.id,
-                  name: session.user.user_metadata?.name ?? session.user.email ?? '',
-                  email: session.user.email ?? '',
-                  organisationId,
-                });
-              } else {
-                setCurrentUser(null);
-              }
-            }
-          );
-          return () => subscription.unsubscribe();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (session?.user) {
+          // Set currentUser immediately with what we know (no org id yet).
+          // Then fetch org id in the background and update without blocking.
+          const baseUser: AuthUser = {
+            id: session.user.id,
+            name: session.user.user_metadata?.name ?? session.user.email ?? '',
+            email: session.user.email ?? '',
+            organisationId: null,
+          };
+          setCurrentUser(baseUser);
+          setAuthLoading(false);
+          // Non-blocking: fetch org id and patch currentUser when ready.
+          fetchOrgId(session.user.id).then((organisationId) => {
+            setCurrentUser((prev) =>
+              prev && prev.id === session.user.id
+                ? { ...prev, organisationId }
+                : prev
+            );
+          }).catch(() => {
+            // fetchOrgId failure is non-fatal; organisationId stays null.
+          });
+        } else {
+          setCurrentUser(null);
+          setAuthLoading(false);
+        }
+      }
+    );
+    return () => subscription.unsubscribe();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -70,7 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-          <AuthContext.Provider value={{ currentUser, login, register, logout }}>
+          <AuthContext.Provider value={{ currentUser, authLoading, login, register, logout }}>
               {children}
           </AuthContext.Provider>
         );

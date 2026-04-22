@@ -1,5 +1,5 @@
 /**
- * auth.ts â Step 5: Supabase Auth adapter
+ * auth.ts Ã¢ÂÂ Step 5: Supabase Auth adapter
  *
  * Replaces the previous localStorage/PBKDF2 system.
  * All exported names and the AuthUser shape are unchanged so the
@@ -47,7 +47,7 @@ export async function fetchOrgId(userId: string): Promise<string | null> {
 
 /**
  * Returns the current user synchronously from the Supabase session cache.
- * Supabase-js keeps the session in localStorage automatically â no manual
+ * Supabase-js keeps the session in localStorage automatically Ã¢ÂÂ no manual
  * session management needed.
  */
 export function getSession(): AuthUser | null {
@@ -79,7 +79,7 @@ export function clearSession(): void {
   supabase.auth.signOut().catch(() => {});
 }
 
-/** Returns the current user's id or null â used outside React (e.g. mockData.ts). */
+/** Returns the current user's id or null Ã¢ÂÂ used outside React (e.g. mockData.ts). */
 export function getCurrentUserId(): string | null {
     return getSession()?.id ?? null;
 }
@@ -112,13 +112,11 @@ export async function signIn(email: string, password: string): Promise<AuthUser>
   const user = data.user;
     if (!user) throw new Error('Sign in failed. Please try again.');
 
-  const organisationId = await fetchOrgId(user.id);
-
   return {
         id: user.id,
         name: user.user_metadata?.name ?? user.email ?? '',
         email: user.email ?? '',
-        organisationId,
+        organisationId: null,
   };
 }
 
@@ -158,14 +156,13 @@ export async function signUp(
               );
   }
 
-  // session exists only when confirmation is disabled â immediate login
+  // session exists only when confirmation is disabled — immediate login
   const user = data.user!;
-  const organisationId = await fetchOrgId(user.id);
 
     return {
           id: user.id,
           name: user.user_metadata?.name ?? user.email ?? '',
           email: user.email ?? '',
-          organisationId,
+          organisationId: null,
     };
 }
