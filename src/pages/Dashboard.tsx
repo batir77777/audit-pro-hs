@@ -423,5 +423,4 @@ export default function Dashboard() {
       </section>
     </div>
   );
->>>>>>> c545ff7 (UI improvements + stable sync version (mobile + dashboard + sidebar polish))
 }
