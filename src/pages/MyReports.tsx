@@ -38,7 +38,7 @@ import {
   TabsList, 
   TabsTrigger 
 } from '@/components/ui/tabs';
-import { mockReports, getReportById, softDeleteReport, restoreReport, permanentDeleteReport } from '@/lib/mockData';
+import { softDeleteReport, restoreReport, permanentDeleteReport } from '@/lib/mockData';
 import { useAuth } from '@/lib/authContext';
 import { useReports } from '@/lib/useReports';
 import { exportSavedReportToPDF, exportSavedReportToWord } from '@/lib/exportUtils';
