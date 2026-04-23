@@ -96,7 +96,7 @@ export default function NewReportPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8 pb-10">
       {/* Header */}
       <section className="space-y-1">
         <div className="flex items-center gap-2 text-sitk-black/40 font-black uppercase text-[10px] tracking-[0.2em]">
@@ -112,16 +112,17 @@ export default function NewReportPage() {
 
       <SectionHeader title="Select Report Type" icon={Plus} description="Pick a category to view available forms" />
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr items-stretch">
         {categories.map((cat, i) => (
           <motion.div
             key={cat.title}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
+            className="h-full"
           >
             <Card
-              className="border border-slate-100 shadow-sm cursor-pointer hover:shadow-md hover:border-sitk-yellow transition-all group"
+              className="h-full border border-slate-200/80 shadow-sm cursor-pointer hover:shadow-md hover:border-sitk-yellow transition-all group bg-white"
               onClick={() => navigate(cat.href)}
             >
               <CardContent className="p-6 flex items-start gap-4">

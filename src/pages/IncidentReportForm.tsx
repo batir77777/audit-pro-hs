@@ -104,8 +104,8 @@ export default function IncidentReportForm() {
   };
 
   return (
-    <div className="space-y-8 pb-32 max-w-3xl mx-auto" id="incident-report">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="space-y-7 md:space-y-8 pb-24 md:pb-12 max-w-3xl mx-auto px-1 sm:px-0" id="incident-report">
+      <div className="sticky top-2 md:top-3 z-30 flex flex-col md:flex-row md:items-center justify-between gap-6 rounded-xl border border-slate-200/80 bg-white/95 backdrop-blur px-3 py-2 shadow-sm">
         <Button 
           variant="ghost" 
           size="sm" 
@@ -168,7 +168,7 @@ export default function IncidentReportForm() {
                     type="date" 
                     value={formData.date} 
                     onChange={e => setFormData({...formData, date: e.target.value})} 
-                    className="py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow font-mono"
+                    className="py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35 font-mono"
                   />
                 </div>
                 <div className="space-y-2">
@@ -177,7 +177,7 @@ export default function IncidentReportForm() {
                     type="time" 
                     value={formData.time} 
                     onChange={e => setFormData({...formData, time: e.target.value})} 
-                    className="py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow font-mono"
+                    className="py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35 font-mono"
                   />
                 </div>
               </div>
@@ -187,7 +187,7 @@ export default function IncidentReportForm() {
                 <div className="relative">
                   <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <Input 
-                    className="pl-12 py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow" 
+                    className="pl-12 py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35" 
                     value={formData.location} 
                     onChange={e => setFormData({...formData, location: e.target.value})} 
                     placeholder="Where did it happen?"
@@ -205,14 +205,14 @@ export default function IncidentReportForm() {
                 <Label className="uppercase text-[10px] font-black tracking-widest text-muted-foreground">Person Reporting</Label>
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input className="pl-12 py-6 bg-slate-100 border-none font-bold" value={formData.personReporting} disabled />
+                  <Input className="pl-12 py-6 bg-slate-100 border border-slate-300 font-bold" value={formData.personReporting} disabled />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label className="uppercase text-[10px] font-black tracking-widest text-muted-foreground">Persons Involved</Label>
                 <Input 
-                  className="py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow"
+                  className="py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35"
                   value={formData.personsInvolved} 
                   onChange={e => setFormData({...formData, personsInvolved: e.target.value})} 
                   placeholder="Names of anyone involved"
@@ -231,14 +231,14 @@ export default function IncidentReportForm() {
                   value={formData.description} 
                   onChange={e => setFormData({...formData, description: e.target.value})} 
                   placeholder="Provide a clear description of what happened..."
-                  className="min-h-[120px] bg-slate-50 border-none focus-visible:ring-sitk-yellow p-4"
+                  className="min-h-[120px] bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35 p-4"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label className="uppercase text-[10px] font-black tracking-widest text-muted-foreground">Injury Details (if any)</Label>
                 <Input 
-                  className="py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow"
+                  className="py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35"
                   value={formData.injuryDetails} 
                   onChange={e => setFormData({...formData, injuryDetails: e.target.value})} 
                   placeholder="Nature of injuries, if applicable"
@@ -249,7 +249,7 @@ export default function IncidentReportForm() {
                 <div className="space-y-2">
                   <Label className="uppercase text-[10px] font-black tracking-widest text-muted-foreground">Immediate Action Taken</Label>
                   <Input 
-                    className="py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow"
+                    className="py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35"
                     value={formData.immediateAction} 
                     onChange={e => setFormData({...formData, immediateAction: e.target.value})} 
                     placeholder="What was done straight away?"
@@ -259,7 +259,7 @@ export default function IncidentReportForm() {
                 <div className="space-y-2">
                   <Label className="uppercase text-[10px] font-black tracking-widest text-muted-foreground">Further Action Required</Label>
                   <Input 
-                    className="py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow"
+                    className="py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35"
                     value={formData.furtherAction} 
                     onChange={e => setFormData({...formData, furtherAction: e.target.value})} 
                     placeholder="What needs to happen next?"
@@ -316,7 +316,7 @@ export default function IncidentReportForm() {
           <SectionHeader title="Executive Summary" icon={FileText} description="Assessor's professional summary — key findings, actions required, and overall compliance judgement" className="mb-0" />
           <Textarea 
             placeholder="Enter the executive summary — key findings, compliance level rationale, recommendations, and actions required..."
-            className="min-h-[160px] bg-slate-50 border-none focus-visible:ring-sitk-yellow p-4 resize-none font-medium text-sm"
+            className="min-h-[160px] bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35 p-4 resize-none font-medium text-sm"
             value={formData.executiveSummary}
             onChange={e => setFormData(prev => ({ ...prev, executiveSummary: e.target.value }))}
           />

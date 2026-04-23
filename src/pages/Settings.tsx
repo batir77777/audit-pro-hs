@@ -86,15 +86,15 @@ export default function Settings() {
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="name" className="uppercase text-[10px] font-black tracking-widest text-muted-foreground">Full Name</Label>
-                <Input id="name" className="py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow" defaultValue={currentUser?.name ?? mockUser.name} />
+                <Input id="name" className="py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35" defaultValue={currentUser?.name ?? mockUser.name} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email" className="uppercase text-[10px] font-black tracking-widest text-muted-foreground">Email Address</Label>
-                <Input id="email" className="py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow" defaultValue={currentUser?.email ?? mockUser.email} />
+                <Input id="email" className="py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35" defaultValue={currentUser?.email ?? mockUser.email} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="role" className="uppercase text-[10px] font-black tracking-widest text-muted-foreground">Job Role</Label>
-                <Input id="role" className="py-6 bg-slate-100 border-none font-bold" defaultValue={mockUser.role} disabled />
+                <Input id="role" className="py-6 bg-slate-100 border border-slate-300 font-bold" defaultValue={mockUser.role} disabled />
               </div>
             </div>
             <Button className="bg-sitk-black text-white hover:bg-slate-800 font-black uppercase text-[10px] tracking-widest px-8 py-6 rounded-xl shadow-lg">Save Changes</Button>
@@ -200,7 +200,7 @@ export default function Settings() {
                 <Label htmlFor="brand-company" className="uppercase text-[10px] font-black tracking-widest text-muted-foreground">Company Name</Label>
                 <Input
                   id="brand-company"
-                  className="py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow font-bold"
+                  className="py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35 font-bold"
                   value={draft.companyName}
                   onChange={e => setDraft(prev => ({ ...prev, companyName: e.target.value }))}
                   placeholder="e.g. Safety is the Key Ltd"
@@ -213,7 +213,7 @@ export default function Settings() {
                 </Label>
                 <Input
                   id="brand-address"
-                  className="py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow"
+                  className="py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35"
                   value={draft.address}
                   onChange={e => setDraft(prev => ({ ...prev, address: e.target.value }))}
                   placeholder="e.g. 2 Palace Green, Croydon, CR0 9AG"
@@ -226,7 +226,7 @@ export default function Settings() {
                 </Label>
                 <Input
                   id="brand-phone"
-                  className="py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow"
+                  className="py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35"
                   value={draft.phone}
                   onChange={e => setDraft(prev => ({ ...prev, phone: e.target.value }))}
                   placeholder="e.g. 020 8406 5039"
@@ -240,7 +240,7 @@ export default function Settings() {
                 <Input
                   id="brand-email"
                   type="email"
-                  className="py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow"
+                  className="py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35"
                   value={draft.email}
                   onChange={e => setDraft(prev => ({ ...prev, email: e.target.value }))}
                   placeholder="e.g. info@example.co.uk"
@@ -253,7 +253,7 @@ export default function Settings() {
                 </Label>
                 <Input
                   id="brand-website"
-                  className="py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow"
+                  className="py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35"
                   value={draft.website}
                   onChange={e => setDraft(prev => ({ ...prev, website: e.target.value }))}
                   placeholder="e.g. www.example.co.uk"

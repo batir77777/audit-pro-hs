@@ -214,20 +214,20 @@ export default function DynamicRiskAssessmentForm() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-32" id="dra-report">
+    <div className="max-w-4xl mx-auto space-y-7 md:space-y-8 pb-24 md:pb-12 px-1 sm:px-0" id="dra-report">
       {/* Header Actions */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="flex items-center gap-4">
+      <div className="sticky top-2 md:top-3 z-30 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 rounded-xl border border-slate-200/80 bg-white/95 backdrop-blur px-3 py-2 shadow-sm">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={() => navigate(-1)}
-            className="font-black uppercase text-[10px] tracking-widest hover:bg-slate-100 export-hide"
+            className="font-black uppercase text-[10px] tracking-widest hover:bg-slate-100 export-hide h-9"
           >
             <ChevronLeft className="mr-2 h-3 w-3" />
             Back
           </Button>
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full export-hide">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full export-hide border border-slate-200/80">
             <Clock className="w-3 h-3 text-slate-400" />
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Current Status:</span>
             <StatusBadge status={currentStatus} />
@@ -240,23 +240,23 @@ export default function DynamicRiskAssessmentForm() {
           formData={formData}          photos={photos}          reportId={reportId}
           onSave={handleSave}
           isSubmitting={isSubmitting}
-          className="flex flex-wrap justify-end"
+          className="w-full md:w-auto flex flex-wrap justify-start md:justify-end gap-2"
         />
       </div>
 
       {/* Title & Instructions */}
       <div className="space-y-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2 text-sitk-black/40 font-black uppercase text-[10px] tracking-[0.2em]">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2 text-slate-500 font-black uppercase text-[10px] tracking-[0.16em]">
             <ShieldAlert className="w-3 h-3" /> Dynamic Risk Assessment
           </div>
-          <h2 className="text-3xl font-black tracking-tighter uppercase text-slate-900 leading-none">
+          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 leading-tight">
             Dynamic Risk Assessment
           </h2>
-          <p className="text-muted-foreground font-medium text-[10px] uppercase tracking-widest">Safety is the Key Ltd | SITK-DRA-001</p>
+          <p className="text-slate-500 font-medium text-[10px] uppercase tracking-[0.12em]">Safety is the Key Ltd | SITK-DRA-001</p>
         </div>
 
-        <Card className="border-none bg-sitk-yellow/10 border-l-4 border-l-sitk-yellow rounded-xl shadow-sm">
+        <Card className="border border-amber-200/80 bg-amber-50/60 border-l-4 border-l-sitk-yellow rounded-xl shadow-sm">
           <CardContent className="p-4 flex gap-3">
             <Info className="w-5 h-5 text-sitk-black shrink-0 mt-0.5" />
             <p className="text-sm font-bold leading-relaxed text-sitk-black">
@@ -268,8 +268,8 @@ export default function DynamicRiskAssessmentForm() {
       </div>
 
       {/* Section 1: Project Details */}
-      <Card className="border-none shadow-sm rounded-2xl overflow-hidden border-t-4 border-t-sitk-black">
-        <CardContent className="p-8 space-y-8">
+      <Card className="border border-slate-200/80 shadow-sm rounded-2xl overflow-hidden border-t-4 border-t-sitk-black bg-white">
+        <CardContent className="p-6 sm:p-8 space-y-8">
           <SectionHeader title="Section 1: Project Details" icon={Info} className="mb-0" />
           <div className="grid gap-x-8 gap-y-6 md:grid-cols-2">
             <div className="space-y-2.5">
@@ -769,7 +769,7 @@ export default function DynamicRiskAssessmentForm() {
           <SectionHeader title="Executive Summary" icon={FileText} description="Assessor's professional summary — key findings, actions required, and overall compliance judgement" className="mb-0" />
           <Textarea 
             placeholder="Enter the executive summary — key findings, compliance level rationale, recommendations, and actions required..."
-            className="min-h-[160px] bg-slate-50 border-none focus-visible:ring-sitk-yellow p-4 resize-none font-medium text-sm"
+            className="min-h-[160px] bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35 p-4 resize-none font-medium text-sm"
             value={formData.executiveSummary}
             onChange={e => setFormData(prev => ({ ...prev, executiveSummary: e.target.value }))}
           />

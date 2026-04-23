@@ -121,31 +121,31 @@ export default function ChecklistForm() {
   const allAnswered = formData.items.every(item => item.answer !== undefined);
 
   return (
-    <div className="space-y-8 pb-24 max-w-3xl mx-auto">
-      <div className="flex items-center justify-between gap-4">
+    <div className="space-y-8 md:space-y-9 pb-24 md:pb-12 max-w-5xl mx-auto px-2 sm:px-3 lg:px-4">
+      <div className="sticky top-2 md:top-3 z-30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 rounded-xl border border-slate-200/80 bg-white/95 backdrop-blur px-3 py-2 shadow-sm">
         <Button 
           variant="ghost" 
           size="sm" 
           onClick={() => navigate(-1)}
-          className="font-black uppercase text-[10px] tracking-widest hover:bg-slate-100"
+          className="font-black uppercase text-[10px] tracking-widest hover:bg-slate-100 h-9"
         >
           <ChevronLeft className="mr-2 h-3 w-3" />
           Back
         </Button>
-        <div className="flex gap-2">
+        <div className="flex w-full sm:w-auto gap-2 sm:justify-end">
           <Button 
             variant="outline" 
             size="sm" 
             onClick={() => handleSave('Draft')} 
             disabled={isSubmitting}
-            className="font-black uppercase text-[10px] tracking-widest bg-white border-none shadow-sm"
+            className="flex-1 sm:flex-none font-black uppercase text-[10px] tracking-widest bg-white border border-slate-200 shadow-sm h-9"
           >
             <Save className="mr-2 h-3 w-3" />
             Save Draft
           </Button>
           <Button 
             size="sm" 
-            className="bg-sitk-black text-white hover:bg-slate-800 font-black uppercase text-[10px] tracking-widest shadow-md" 
+            className="flex-1 sm:flex-none bg-sitk-black text-white hover:bg-slate-800 font-black uppercase text-[10px] tracking-widest shadow-sm h-9" 
             onClick={() => handleSave('Submitted')} 
             disabled={isSubmitting || !allAnswered}
           >
@@ -155,19 +155,19 @@ export default function ChecklistForm() {
         </div>
       </div>
 
-      <div className="space-y-1">
-        <div className="flex items-center gap-2 text-sitk-black/40 font-black uppercase text-[10px] tracking-[0.2em]">
+      <div className="space-y-1.5">
+        <div className="flex items-center gap-2 text-slate-500 font-black uppercase text-[10px] tracking-[0.16em]">
           <ClipboardCheck className="w-3 h-3" /> Checklist Module
         </div>
-        <h2 className="text-3xl font-black tracking-tighter uppercase text-slate-900 leading-none">
+        <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 leading-tight">
           {template.title}
         </h2>
-        <p className="text-muted-foreground font-medium text-[10px] uppercase tracking-widest">Safety is the Key Ltd | {template.category}</p>
+        <p className="text-slate-500 font-medium text-[10px] uppercase tracking-[0.12em]">Safety is the Key Ltd | {template.category}</p>
       </div>
 
       {/* Header Info */}
-      <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
-        <CardContent className="p-8 space-y-8">
+      <Card className="border border-slate-300/80 shadow-[0_6px_18px_rgba(15,23,42,0.06)] rounded-2xl overflow-hidden bg-white">
+        <CardContent className="p-5 md:p-7 space-y-6 md:space-y-7">
           <SectionHeader title="Basic Information" icon={Info} description="Site and completion details" className="mb-0" />
           <div className="grid gap-6 md:grid-cols-3">
             <div className="space-y-2">
@@ -175,7 +175,7 @@ export default function ChecklistForm() {
               <div className="relative">
                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input 
-                  className="pl-12 py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow" 
+                  className="pl-12 py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35" 
                   value={formData.location} 
                   onChange={e => setFormData({...formData, location: e.target.value})} 
                   placeholder="e.g. Manchester Site A"
@@ -188,7 +188,7 @@ export default function ChecklistForm() {
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input 
                   type="date" 
-                  className="pl-12 py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow font-mono"
+                  className="pl-12 py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35 font-mono"
                   value={formData.date} 
                   onChange={e => setFormData({...formData, date: e.target.value})} 
                 />
@@ -198,7 +198,7 @@ export default function ChecklistForm() {
               <Label className="uppercase text-[10px] font-black tracking-widest text-muted-foreground">Completed By</Label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <Input className="pl-12 py-6 bg-slate-100 border-none font-bold" value={formData.personCompleting} disabled />
+                <Input className="pl-12 py-6 bg-slate-100 border border-slate-300 font-bold" value={formData.personCompleting} disabled />
               </div>
             </div>
           </div>
@@ -216,12 +216,12 @@ export default function ChecklistForm() {
             transition={{ delay: index * 0.05 }}
           >
             <Card className={cn(
-              "border-none shadow-sm transition-all rounded-2xl overflow-hidden",
+              "border border-slate-300/80 shadow-[0_4px_14px_rgba(15,23,42,0.06)] transition-all rounded-2xl overflow-hidden bg-white",
               item.answer === 'No' ? "ring-1 ring-red-200 bg-red-50/30" : "bg-white"
             )}>
-              <CardContent className="p-6 space-y-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div className="flex gap-4 flex-1">
+              <CardContent className="p-4 md:p-6 space-y-4 md:space-y-5">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
+                  <div className="flex gap-3 md:gap-4 flex-1">
                     <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-xs font-black text-slate-400 shrink-0">
                       {index + 1}
                     </span>
@@ -231,7 +231,7 @@ export default function ChecklistForm() {
                   <RadioGroup 
                     value={item.answer} 
                     onValueChange={(val) => handleAnswerChange(item.id, val as ChecklistAnswer)}
-                    className="flex items-center gap-2 bg-slate-100/50 p-1 rounded-xl w-fit"
+                    className="flex items-center flex-wrap justify-between sm:justify-start gap-1.5 bg-slate-100/70 p-1.5 rounded-xl w-full sm:w-fit"
                   >
                     <div className="flex items-center">
                       <RadioGroupItem value="Yes" id={`yes-${item.id}`} className="sr-only" />
@@ -275,7 +275,7 @@ export default function ChecklistForm() {
                 <div className="relative">
                   <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <Input 
-                    className="pl-12 py-6 bg-slate-50 border-none focus-visible:ring-sitk-yellow text-sm" 
+                    className="pl-12 py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35 text-sm" 
                     placeholder="Add comments or details..." 
                     value={item.comment}
                     onChange={e => handleCommentChange(item.id, e.target.value)}
@@ -288,12 +288,12 @@ export default function ChecklistForm() {
       </div>
 
       {/* Overall Comments */}
-      <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
-        <CardContent className="p-8 space-y-6">
+      <Card className="border border-slate-300/80 shadow-[0_6px_18px_rgba(15,23,42,0.06)] rounded-2xl overflow-hidden bg-white">
+        <CardContent className="p-5 md:p-7 space-y-5 md:space-y-6">
           <SectionHeader title="Executive Summary" icon={FileText} description="Overall comments and professional assessment observations" className="mb-0" />
           <Textarea 
             placeholder="Enter the executive summary — key findings, actions required, and overall assessment..." 
-            className="min-h-[120px] bg-slate-50 border-none focus-visible:ring-sitk-yellow p-4"
+            className="min-h-[120px] bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35 p-4"
             value={formData.executiveSummary}
             onChange={e => setFormData({...formData, executiveSummary: e.target.value})}
           />
@@ -301,7 +301,7 @@ export default function ChecklistForm() {
       </Card>
 
       {/* Photos Section */}
-      <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm space-y-4">
+      <div className="rounded-2xl border border-slate-300/80 bg-white p-5 md:p-6 shadow-[0_4px_14px_rgba(15,23,42,0.06)] space-y-4 md:space-y-5">
         <PhotoUpload photos={photos} onPhotosChange={updatePhotos} />
       </div>
 

@@ -183,9 +183,9 @@ export default function ContractorVettingSmallForm() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-10 pb-32 px-4 sm:px-6">
+    <div className="max-w-5xl mx-auto space-y-7 md:space-y-8 pb-24 md:pb-12 px-1 sm:px-2">
       {/* Header Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4">
+      <div className="sticky top-2 md:top-3 z-30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 rounded-xl border border-slate-200/80 bg-white/95 backdrop-blur px-3 py-2 shadow-sm">
         <div className="flex items-center gap-3">
           <Button 
             variant="ghost" 
@@ -500,7 +500,7 @@ export default function ContractorVettingSmallForm() {
               </p>
             </div>
 
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               <div className="space-y-3">
                 <RequiredLabel required className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">PRINT Name</RequiredLabel>
                 <Input 
@@ -654,7 +654,7 @@ export default function ContractorVettingSmallForm() {
           <SectionHeader title="Executive Summary" icon={FileText} description="Assessor's professional summary — key findings, actions required, and overall compliance judgement" className="mb-0" />
           <Textarea 
             placeholder="Enter the executive summary — key findings, compliance level rationale, recommendations, and actions required..."
-            className="min-h-[160px] bg-slate-50 border-none focus-visible:ring-sitk-yellow p-4 resize-none font-medium text-sm"
+            className="min-h-[160px] bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35 p-4 resize-none font-medium text-sm"
             value={formData.executiveSummary}
             onChange={e => setFormData(prev => ({ ...prev, executiveSummary: e.target.value }))}
           />

@@ -48,11 +48,18 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    scrollbar-gutter: stable;
+  }
+  html, body, #root {
+    min-height: 100%;
+    overflow-x: hidden;
+  }
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased;
+    @apply bg-slate-100 text-slate-900 font-sans antialiased;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-sans font-black uppercase tracking-tighter;
+    @apply font-sans font-extrabold tracking-tight;
   }
 }
 

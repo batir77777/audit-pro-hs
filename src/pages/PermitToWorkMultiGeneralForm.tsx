@@ -285,7 +285,7 @@ export default function PermitToWorkMultiGeneralForm() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto pb-20">
+    <div className="max-w-5xl mx-auto space-y-8 md:space-y-9 pb-24 md:pb-12 px-2 sm:px-3 lg:px-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <Button 
@@ -819,7 +819,7 @@ export default function PermitToWorkMultiGeneralForm() {
           </div>
 
           <div className="p-6 bg-sitk-yellow/10 border border-sitk-yellow/20 rounded-[2rem] flex gap-4 items-start">
-            <div className="bg-sitk-yellow p-2 rounded-xl shrink-0 shadow-lg">
+            <div className="bg-sitk-yellow/90 p-2.5 rounded-xl shrink-0 shadow-sm ring-1 ring-sitk-black/10">
               <AlertCircle className="w-5 h-5 text-sitk-black" />
             </div>
             <p className="text-sm font-medium text-slate-700 leading-relaxed">
@@ -1036,11 +1036,11 @@ export default function PermitToWorkMultiGeneralForm() {
 
       {/* Executive Summary */}
       <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
-        <CardContent className="p-8 space-y-6">
+        <CardContent className="p-5 md:p-7 space-y-5 md:space-y-6">
           <SectionHeader title="Executive Summary" icon={FileText} description="Assessor's professional summary — key findings, actions required, and overall compliance judgement" className="mb-0" />
           <Textarea 
             placeholder="Enter the executive summary — key findings, compliance level rationale, recommendations, and actions required..."
-            className="min-h-[160px] bg-slate-50 border-none focus-visible:ring-sitk-yellow p-4 resize-none font-medium text-sm"
+            className="min-h-[160px] bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35 p-4 resize-none font-medium text-sm"
             value={formData.executiveSummary}
             onChange={e => setFormData(prev => ({ ...prev, executiveSummary: e.target.value }))}
           />

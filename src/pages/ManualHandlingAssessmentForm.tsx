@@ -218,7 +218,7 @@ export default function ManualHandlingAssessmentForm() {
   }, [formData]);
 
   return (
-    <div className="max-w-5xl mx-auto pb-32" id="manual-handling-report">
+    <div className="max-w-5xl mx-auto space-y-8 pb-24 md:pb-12 px-1 sm:px-2" id="manual-handling-report">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div className="flex items-center gap-4">
           <Button 
@@ -762,7 +762,7 @@ export default function ManualHandlingAssessmentForm() {
           <SectionHeader title="Executive Summary" icon={FileText} description="Assessor's professional summary — key findings, actions required, and overall compliance judgement" className="mb-0" />
           <Textarea 
             placeholder="Enter the executive summary — key findings, compliance level rationale, recommendations, and actions required..."
-            className="min-h-[160px] bg-slate-50 border-none focus-visible:ring-sitk-yellow p-4 resize-none font-medium text-sm"
+            className="min-h-[160px] bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35 p-4 resize-none font-medium text-sm"
             value={formData.executiveSummary}
             onChange={e => setFormData(prev => ({ ...prev, executiveSummary: e.target.value }))}
           />

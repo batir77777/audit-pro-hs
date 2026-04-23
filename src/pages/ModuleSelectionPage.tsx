@@ -134,16 +134,16 @@ export default function ModuleSelectionPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8 pb-10">
       <SectionHeader 
         title={config.title} 
         icon={config.icon} 
         description={config.description} 
       />
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr items-stretch">
         {config.templates.map((template) => (
-          <Card key={template.id} className="border-none shadow-sm hover:shadow-md transition-all group">
+          <Card key={template.id} className="h-full border border-slate-200/80 shadow-sm hover:shadow-md transition-all group bg-white">
             <CardHeader className="pb-4">
               <div className="bg-sitk-yellow/10 p-3 rounded-xl w-fit mb-4 group-hover:bg-sitk-yellow transition-colors">
                 <template.icon className="w-6 h-6 text-sitk-black" />
@@ -153,7 +153,7 @@ export default function ModuleSelectionPage() {
                 {template.description}
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="mt-auto">
               <Button 
                 className="w-full bg-sitk-black text-white hover:bg-slate-800 font-black uppercase text-[10px] tracking-widest py-6"
                 onClick={() => {

@@ -467,10 +467,10 @@ export default function DSEAssessmentForm() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-10 pb-32 px-4 sm:px-6">
+    <div className="max-w-4xl mx-auto space-y-8 md:space-y-10 pb-24 md:pb-12 px-1 sm:px-4">
       {/* Header Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4">
-        <div className="flex items-center gap-3">
+      <div className="sticky top-2 md:top-3 z-30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 rounded-xl border border-slate-200/80 bg-white/95 backdrop-blur px-3 py-2 shadow-sm">
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
           <Button 
             variant="ghost" 
             size="sm" 
@@ -480,7 +480,7 @@ export default function DSEAssessmentForm() {
             <ChevronLeft className="mr-2 h-3.5 w-3.5" />
             Back
           </Button>
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-full">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200/80 rounded-full">
             <div className={cn(
               "w-1.5 h-1.5 rounded-full animate-pulse",
               currentStatus === 'Draft' ? "bg-yellow-400" : 
@@ -490,13 +490,13 @@ export default function DSEAssessmentForm() {
             <StatusBadge status={currentStatus} />
           </div>
         </div>
-        <div className="flex gap-2.5">
+        <div className="flex w-full sm:w-auto gap-2.5 sm:justify-end">
           <Button 
             variant="outline" 
             size="sm" 
             onClick={() => handleSave('Draft')}
             disabled={isSubmitting}
-            className="font-black uppercase text-[10px] tracking-widest border-slate-200 hover:bg-slate-50 hover:border-slate-300 min-w-[110px] h-9 transition-all"
+            className="flex-1 sm:flex-none font-black uppercase text-[10px] tracking-widest border-slate-200 hover:bg-slate-50 hover:border-slate-300 min-w-[110px] h-9 transition-all"
           >
             {isSubmitting && currentStatus === 'Draft' ? (
               <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
@@ -511,7 +511,7 @@ export default function DSEAssessmentForm() {
             size="sm" 
             onClick={() => handleSave('Submitted')}
             disabled={isSubmitting}
-            className="bg-sitk-black text-white hover:bg-slate-800 font-black uppercase text-[10px] tracking-widest min-w-[130px] h-9 shadow-sm transition-all"
+            className="flex-1 sm:flex-none bg-sitk-black text-white hover:bg-slate-800 font-black uppercase text-[10px] tracking-widest min-w-[130px] h-9 shadow-sm transition-all"
           >
             {isSubmitting && currentStatus === 'Submitted' ? (
               <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
@@ -525,17 +525,17 @@ export default function DSEAssessmentForm() {
         </div>
       </div>
 
-      <div className="space-y-3">
-        <h1 className="text-3xl font-black uppercase tracking-tight text-slate-900 leading-none">Computer / DSE / VDU Assessment Form</h1>
+      <div className="space-y-2.5">
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 leading-tight">Computer / DSE / VDU Assessment Form</h1>
         <div className="flex items-center gap-3">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Workplaces • Safety is the Key Ltd</p>
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.16em]">Workplaces • Safety is the Key Ltd</p>
           <div className="h-px w-12 bg-slate-200" />
           <Badge variant="outline" className="bg-slate-50 text-slate-400 border-slate-200 text-[9px] font-black uppercase tracking-widest px-2 py-0">v2.4</Badge>
         </div>
       </div>
 
       {/* Introduction Panel */}
-      <Card className="border-none shadow-md overflow-hidden bg-white rounded-2xl">
+      <Card className="border border-slate-200/80 shadow-sm overflow-hidden bg-white rounded-2xl">
         <CardHeader className="bg-blue-50/50 border-b border-blue-100 py-5 px-6 sm:px-8">
           <div className="flex items-center gap-3">
             <div className="bg-blue-500 p-2 rounded-xl shadow-sm">
@@ -602,7 +602,7 @@ export default function DSEAssessmentForm() {
       </Card>
 
       {/* Section 1: User and Assessment Details */}
-      <Card className="border-none shadow-md overflow-hidden bg-white rounded-2xl">
+      <Card className="border border-slate-200/80 shadow-sm overflow-hidden bg-white rounded-2xl">
         <CardHeader className="bg-slate-50/80 border-b border-slate-100 py-5 px-6 sm:px-8">
           <div className="flex items-center gap-3">
             <div className="bg-sitk-yellow p-2 rounded-xl shadow-sm">
@@ -1189,7 +1189,7 @@ export default function DSEAssessmentForm() {
           <SectionHeader title="Executive Summary" icon={FileText} description="Assessor's professional summary — key findings, actions required, and overall compliance judgement" className="mb-0" />
           <Textarea 
             placeholder="Enter the executive summary — key findings, compliance level rationale, recommendations, and actions required..."
-            className="min-h-[160px] bg-slate-50 border-none focus-visible:ring-sitk-yellow p-4 resize-none font-medium text-sm"
+            className="min-h-[160px] bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35 p-4 resize-none font-medium text-sm"
             value={formData.executiveSummary}
             onChange={e => setFormData(prev => ({ ...prev, executiveSummary: e.target.value }))}
           />
