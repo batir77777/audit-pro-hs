@@ -97,9 +97,11 @@ export async function fetchReportsFromSupabase(userId: string): Promise<Report[]
           try {
                       const { data: { session } } = await supabase.auth.getSession();
                       if (!session) return [];
+                      const SELECT_COLS = 'id, title, type, status, location, date, description, created_by, report_data(form_data)';
+                      console.log('[fetchReports] using select:', SELECT_COLS);
                       const { data, error } = await supabase
                         .from('reports')
-                        .select('id, title, type, status, location, date, description, created_by, report_data(form_data)')
+                        .select(SELECT_COLS)
                         .eq('created_by', userId)
                         .order('created_at', { ascending: false })
                       if (error) { console.warn('[reportService] fetch:', error.message); return []; }
