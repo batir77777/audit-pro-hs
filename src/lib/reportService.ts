@@ -80,7 +80,7 @@ export async function syncReportToSupabase(report: Report): Promise<{ ok: boolea
         }
         console.log('[syncReport] reports upsert OK:', JSON.stringify(rData));
         const { data: rdData, error: dataError } = await supabase
-        .from('report_data').upsert({ report_id: reportRow.id, form_data: formPayload }, { onConflict: 'report_id' }).select('report_id');
+        .from('report_data').upsert({ report_id: reportRow.id, data: formPayload }, { onConflict: 'report_id' }).select('report_id');
         if (dataError) {
             console.error('[syncReport] REPORT_DATA UPSERT FAILED code:', dataError.code, 'msg:', dataError.message);
             throw new Error('report_data upsert: ' + dataError.message + ' (code: ' + dataError.code + ')');
@@ -97,7 +97,7 @@ export async function fetchReportsFromSupabase(userId: string): Promise<Report[]
           try {
                       const { data: { session } } = await supabase.auth.getSession();
                       if (!session) return [];
-                      const SELECT_COLS = 'id, title, type, status, location, date, description, created_by, report_data(form_data)';
+                      const SELECT_COLS = 'id, title, type, status, location, date, description, created_by, report_data(data)';
                       console.log('[fetchReports] using select:', SELECT_COLS);
                       const { data, error } = await supabase
                         .from('reports')
@@ -106,7 +106,7 @@ export async function fetchReportsFromSupabase(userId: string): Promise<Report[]
                         .order('created_at', { ascending: false })
                       if (error) { console.warn('[reportService] fetch:', error.message); return []; }
                       return (data || []).map((row: any) => {
-                                    const formData = row.report_data?.[0]?.form_data || {};
+                                    const formData = row.report_data?.[0]?.data || {};
                                     return {
                                                     id: row.id,
                                                     title: row.title,
