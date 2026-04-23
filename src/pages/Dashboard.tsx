@@ -226,7 +226,6 @@ export default function Dashboard() {
             </div>
             <div className="flex-1 divide-y divide-slate-100">
               {activeReports.slice(0, 5).map((report) => (
-                                              {activeReports.slice(0, 5).map((report) => (
                           <div
                                               key={report.id}
                                               className="group flex flex-col gap-2 p-4 rounded-xl border border-slate-100 hover:border-sitk-yellow hover:bg-sitk-yellow/5 cursor-pointer transition-all"
