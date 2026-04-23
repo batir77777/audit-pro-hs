@@ -1,6 +1,6 @@
 import { User, Company, Report, Activity } from '../types';
 import { getCurrentUserId, getSession } from './auth';
-import { syncReportToSupabase, softDeleteReportInSupabase, hardDeleteReportFromSupabase } from './reportService';
+import { syncReportToSupabase, softDeleteReportInSupabase } from './reportService';
 
 export const mockUser: User = {
   id: 'u1',
@@ -248,7 +248,7 @@ export const softDeleteReport = (id: string) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   window.dispatchEvent(new Event('reportsUpdated'));
   // Sync deletion to Supabase so it is reflected on all devices
-  softDeleteReportInSupabase(id).catch(e => console.warn('[mockData] softDelete Supabase sync error:', e));
+  softDeleteReportInSupabase(id).catch((e: unknown) => console.warn('[mockData] softDelete Supabase sync error:', e));
 };
 
 export const restoreReport = (id: string) => {
@@ -269,5 +269,5 @@ export const permanentDeleteReport = (id: string) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   window.dispatchEvent(new Event('reportsUpdated'));
   // Hard-delete from Supabase so it disappears on all devices
-  hardDeleteReportFromSupabase(id).catch(e => console.warn('[mockData] hardDelete Supabase error:', e));
+  softDeleteReportInSupabase(id).catch((e: unknown) => console.warn('[mockData] permDelete Supabase sync error:', e));
 };

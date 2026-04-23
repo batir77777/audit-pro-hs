@@ -180,18 +180,6 @@ export async function mergeSupabaseReportsToLocal(): Promise<void> {
 export async function softDeleteReportInSupabase(id: string): Promise<void> {
           try {
                       const { data: { session } } = await supabase.auth.getSession();
-
-export async function hardDeleteReportFromSupabase(id: string): Promise<void> {
-          try {
-                      const { data: { session } } = await supabase.auth.getSession();
-                      if (!session) return;
-                      // Delete report_data first (FK constraint), then the report row
-                      await supabase.from('report_data').delete().eq('report_id', id);
-                      await supabase.from('reports').delete().eq('id', id);
-          } catch (err) {
-                      console.warn('[reportService] hardDelete error (non-fatal):', err);
-          }
-}
                       if (!session) return;
                       await supabase.from('reports').update({ status: 'Deleted' }).eq('id', id);
           } catch (err) {
