@@ -103,7 +103,7 @@ export async function fetchReportsFromSupabase(userId: string): Promise<Report[]
                         .from('reports')
                         .select(SELECT_COLS)
                         .eq('created_by', userId)
-                        .order('created_at', { ascending: false })
+                        .order('updated_at', { ascending: false })
                       if (error) { console.warn('[reportService] fetch:', error.message); return []; }
                       return (data || []).map((row: any) => {
                                     const formData = row.report_data?.[0]?.data || {};
