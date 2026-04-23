@@ -146,8 +146,8 @@ export default function MyReports() {
       const autosaveKey = REPORT_TYPE_TO_AUTOSAVE_KEY[report.type] ??
         (report.type.includes('Checklist') || report.type.includes('Inspection') || report.type.includes('Assessment') ? 'checklist' : undefined);
       if (autosaveKey) {
-        const fullReport = getReportById(report.id) ?? report;
-        preloadDraftForEdit(autosaveKey, fullReport);
+        // Use report directly — it already has full form data from Supabase fetch
+        preloadDraftForEdit(autosaveKey, report);
       }
       navigate(route, { state: { editId: report.id } });
     } else {

@@ -1,6 +1,6 @@
 import { User, Company, Report, Activity } from '../types';
 import { getCurrentUserId, getSession } from './auth';
-import { syncReportToSupabase } from './reportService';
+import { syncReportToSupabase, softDeleteReportInSupabase, hardDeleteReportFromSupabase } from './reportService';
 
 export const mockUser: User = {
   id: 'u1',
@@ -111,7 +111,7 @@ function statusToAction(status: Report['status']): string {
  */
 export function getRecentActivity(limit = 5): Activity[] {
   const reports = getStoredReports().filter(r => r.status !== 'Deleted');
-  // Sort by savedAt > date — most recently touched first
+  // Sort by savedAt > date â most recently touched first
   const sorted = [...reports].sort((a, b) => {
     const ta = (a as any).savedAt || a.date || '';
     const tb = (b as any).savedAt || b.date || '';
@@ -152,7 +152,7 @@ function sanitizeReport(r: Report): Report {
     type = TEMPLATE_ID_TO_TYPE[templateId] as Report['type'];
   }
 
-  // 2. Fix "undefined" title — rebuild from type + date
+  // 2. Fix "undefined" title â rebuild from type + date
   const titleLower = String(title || '').toLowerCase().trim();
   if (!title || titleLower.startsWith('undefined') || titleLower === 'null') {
     title = `${type} - ${r.date || ''}`.replace(/\s*-\s*$/, '');
@@ -166,7 +166,7 @@ function sanitizeReport(r: Report): Report {
 
 const MIGRATION_VERSION_KEY = 'sitk_reports_migration_v1';
 
-/** All reports stored — regardless of user. */
+/** All reports stored â regardless of user. */
 const getAllStoredReports = (): Report[] => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -178,7 +178,7 @@ const getAllStoredReports = (): Report[] => {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
         localStorage.setItem(MIGRATION_VERSION_KEY, '1');
-      } catch { /* quota — skip write-back */ }
+      } catch { /* quota â skip write-back */ }
     }
 
     return sanitized;
@@ -217,19 +217,19 @@ export const saveReport = (report: Report) => {
     console.log('[saveReport] Saved successfully:', reportToSave.id);
         syncReportToSupabase(reportToSave).then((r) => { if (r.ok) { console.log('[saveReport] Supabase sync OK:', reportToSave.id); } else { console.error('[saveReport] Supabase sync FAILED:', reportToSave.id, r.error); } }).catch((e) => { console.error('[saveReport] Supabase sync threw:', e); });
   } catch {
-    // Quota exceeded — retry without embedded photos in all reports
-    console.warn('[saveReport] Storage quota exceeded — retrying without photos');
+    // Quota exceeded â retry without embedded photos in all reports
+    console.warn('[saveReport] Storage quota exceeded â retrying without photos');
     try {
       const stripped = updated.map(r => ({ ...r, photos: [] }));
       persist(stripped);
       console.log('[saveReport] Saved without photos due to storage limit');
     } catch (e2) {
-      // Still failing — save only the current report as last resort
+      // Still failing â save only the current report as last resort
       console.error('[saveReport] Critical storage failure, attempting minimal save:', e2);
       try {
         persist([{ ...reportToSave, photos: [] }]);
       } catch {
-        // Cannot save at all — do not throw, just log, so the form doesn't freeze
+        // Cannot save at all â do not throw, just log, so the form doesn't freeze
         console.error('[saveReport] Unable to write to localStorage. Storage may be full.');
       }
     }
@@ -247,6 +247,8 @@ export const softDeleteReport = (id: string) => {
   );
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   window.dispatchEvent(new Event('reportsUpdated'));
+  // Sync deletion to Supabase so it is reflected on all devices
+  softDeleteReportInSupabase(id).catch(e => console.warn('[mockData] softDelete Supabase sync error:', e));
 };
 
 export const restoreReport = (id: string) => {
@@ -266,4 +268,6 @@ export const permanentDeleteReport = (id: string) => {
   const updated = all.filter(r => r.id !== id);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   window.dispatchEvent(new Event('reportsUpdated'));
+  // Hard-delete from Supabase so it disappears on all devices
+  hardDeleteReportFromSupabase(id).catch(e => console.warn('[mockData] hardDelete Supabase error:', e));
 };
