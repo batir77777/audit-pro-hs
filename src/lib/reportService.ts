@@ -57,6 +57,7 @@ function toSupabasePayload(report: Report, organisationId: string | null) {
 }
 
 export async function syncReportToSupabase(report: Report): Promise<{ ok: boolean; error?: string }> {
+    console.log('[syncReport] FUNCTION CALLED');
     console.log('[syncReport] Starting sync for report:', report.id, 'authorId:', report.authorId);
     try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -70,13 +71,13 @@ export async function syncReportToSupabase(report: Report): Promise<{ ok: boolea
         const orgId = await getMyOrgId();
         const { reportRow, formPayload } = toSupabasePayload(stripPhotos(report), orgId);
         reportRow.created_by = authUid; // Always override with live session uid to satisfy RLS
-        // console.log('[syncReport] Upserting report row:', JSON.stringify(reportRow));
-        // const { data: rData, error: reportError } = await supabase
-        // .from('reports').upsert(reportRow, { onConflict: 'id' }).select('id');
-        // if (reportError) {
-        // console.error('[syncReport] REPORTS UPSERT FAILED code:', reportError.code, 'msg:', reportError.message, 'detail:', reportError.details);
-        // throw new Error('reports upsert: ' + reportError.message + ' (code: ' + reportError.code + ')');
-        // }
+        console.log('[syncReport] Upserting report row:', JSON.stringify(reportRow));
+        const { data: rData, error: reportError } = await supabase
+        .from('reports').upsert(reportRow, { onConflict: 'id' }).select('id');
+        if (reportError) {
+            console.error('[syncReport] REPORTS UPSERT FAILED code:', reportError.code, 'msg:', reportError.message, 'detail:', reportError.details);
+            throw new Error('reports upsert: ' + reportError.message + ' (code: ' + reportError.code + ')');
+        }
         console.log('[syncReport] reports upsert OK:', JSON.stringify(rData));
         const { data: rdData, error: dataError } = await supabase
         .from('report_data').upsert({ report_id: reportRow.id, form_data: formPayload }, { onConflict: 'report_id' }).select('report_id');
@@ -128,7 +129,7 @@ export async function fetchReportsFromSupabase(userId: string): Promise<Report[]
  * - Server records are upserted into the local store (server wins on conflict).
  * - Photos and savedAt from local records are preserved.
  * - Dispatches 'reportsUpdated' so components refresh automatically.
- * - Completely silent on error â localStorage data is always preserved.
+ * - Completely silent on error Ã¢ÂÂ localStorage data is always preserved.
  */
 /**
  * @deprecated No longer called from Dashboard or MyReports.
