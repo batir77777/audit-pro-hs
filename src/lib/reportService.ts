@@ -67,28 +67,35 @@ export async function syncReportToSupabase(report: Report): Promise<{ ok: boolea
         }
         const authUid = session.user.id;
         if (!authUid) { throw new Error('No authenticated user id - cannot satisfy RLS created_by = auth.uid()'); }
-        console.log('[syncReport] Session OK. auth.uid():', authUid, ' report.authorId:', report.authorId);
+        console.log('[syncReport] Session OK. auth.uid():', authUid);
         const orgId = await getMyOrgId();
+        console.log('[syncReport] orgId:', orgId);
         const { reportRow, formPayload } = toSupabasePayload(stripPhotos(report), orgId);
-        reportRow.created_by = authUid; // Always override with live session uid to satisfy RLS
-        console.log('[syncReport] Upserting report row:', JSON.stringify(reportRow));
+        reportRow.created_by = authUid;
+        if (!reportRow.id) { console.error('[syncReport] MISSING report id — upsert will fail'); return { ok: false, error: 'missing_id' }; }
+        console.log('[syncReport] reportRow keys:', Object.keys(reportRow).join(', '));
+        console.log('[syncReport] reportRow values:', JSON.stringify(reportRow));
+        console.log('[syncReport] >>> Calling supabase reports upsert...');
         const { data: rData, error: reportError } = await supabase
         .from('reports').upsert(reportRow, { onConflict: 'id' }).select('id');
+        console.log('[syncReport] reports upsert returned — error:', JSON.stringify(reportError), 'data:', JSON.stringify(rData));
         if (reportError) {
-            console.error('[syncReport] REPORTS UPSERT FAILED code:', reportError.code, 'msg:', reportError.message, 'detail:', reportError.details);
+            console.error('[syncReport] REPORTS UPSERT FAILED code:', reportError.code, 'msg:', reportError.message, 'detail:', reportError.details, 'hint:', (reportError as any).hint);
             throw new Error('reports upsert: ' + reportError.message + ' (code: ' + reportError.code + ')');
         }
         console.log('[syncReport] reports upsert OK:', JSON.stringify(rData));
+        console.log('[syncReport] >>> Calling supabase report_data upsert...');
         const { data: rdData, error: dataError } = await supabase
         .from('report_data').upsert({ report_id: reportRow.id, data: formPayload }, { onConflict: 'report_id' }).select('report_id');
+        console.log('[syncReport] report_data upsert returned — error:', JSON.stringify(dataError), 'data:', JSON.stringify(rdData));
         if (dataError) {
-            console.error('[syncReport] REPORT_DATA UPSERT FAILED code:', dataError.code, 'msg:', dataError.message);
+            console.error('[syncReport] REPORT_DATA UPSERT FAILED code:', dataError.code, 'msg:', dataError.message, 'hint:', (dataError as any).hint);
             throw new Error('report_data upsert: ' + dataError.message + ' (code: ' + dataError.code + ')');
         }
-        console.log('[syncReport] SUCCESS synced to Supabase:', reportRow.id, 'rd:', JSON.stringify(rdData));
+        console.log('[syncReport] SUCCESS synced to Supabase:', reportRow.id);
         return { ok: true };
     } catch (err: any) {
-        console.error('[syncReport] Sync error:', err?.message ?? err);
+        console.error('[syncReport] CAUGHT ERROR — message:', err?.message, 'full:', JSON.stringify(err));
         return { ok: false, error: err?.message ?? 'unknown error' };
     }
 }
@@ -131,7 +138,7 @@ export async function fetchReportsFromSupabase(userId: string): Promise<Report[]
  * - Server records are upserted into the local store (server wins on conflict).
  * - Photos and savedAt from local records are preserved.
  * - Dispatches 'reportsUpdated' so components refresh automatically.
- * - Completely silent on error ÃÂ¢ÃÂÃÂ localStorage data is always preserved.
+ * - Completely silent on error ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ localStorage data is always preserved.
  */
 /**
  * @deprecated No longer called from Dashboard or MyReports.
