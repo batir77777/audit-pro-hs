@@ -99,7 +99,7 @@ export async function fetchReportsFromSupabase(userId: string): Promise<Report[]
                       if (!session) return [];
                       const { data, error } = await supabase
                         .from('reports')
-                        .select('id, title, type, status, location, date, description, created_by, report_data ( form_data )')
+                        .select('id, title, type, status, location, date, description, created_by, report_data(form_data)')
                         .eq('created_by', userId)
                         .order('created_at', { ascending: false })
                       if (error) { console.warn('[reportService] fetch:', error.message); return []; }
@@ -129,7 +129,7 @@ export async function fetchReportsFromSupabase(userId: string): Promise<Report[]
  * - Server records are upserted into the local store (server wins on conflict).
  * - Photos and savedAt from local records are preserved.
  * - Dispatches 'reportsUpdated' so components refresh automatically.
- * - Completely silent on error Ã¢ÂÂ localStorage data is always preserved.
+ * - Completely silent on error ÃÂ¢ÃÂÃÂ localStorage data is always preserved.
  */
 /**
  * @deprecated No longer called from Dashboard or MyReports.
