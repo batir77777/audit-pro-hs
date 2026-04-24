@@ -202,7 +202,7 @@ export default function MyReports() {
 
   return (
     <TooltipProvider delayDuration={300}>
-    <div className="space-y-8">
+    <div className="space-y-8 overflow-x-hidden">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <SectionHeader 
           title="My Reports" 
@@ -269,13 +269,15 @@ export default function MyReports() {
       </div>
 
       <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
-        <TabsList className="bg-slate-200/50 p-1 rounded-xl w-fit flex-wrap gap-1">
+        <div className="overflow-x-auto pb-1">
+        <TabsList className="bg-slate-200/50 p-1 rounded-xl w-max min-w-full flex-nowrap gap-1">
           <TabsTrigger value="all" className="text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">All</TabsTrigger>
           <TabsTrigger value="draft" className="text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">Drafts</TabsTrigger>
           <TabsTrigger value="submitted" className="text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">Submitted</TabsTrigger>
           <TabsTrigger value="completed" className="text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">Completed</TabsTrigger>
           <TabsTrigger value="deleted" className="text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-red-600">Deleted</TabsTrigger>
         </TabsList>
+        </div>
 
         <TabsContent value={activeTab} className="mt-8">
           {/* Desktop Table View */}
@@ -414,19 +416,19 @@ export default function MyReports() {
           {/* Mobile Card View */}
           <div className="md:hidden space-y-4">
             {filteredReports.map((report) => (
-              <div key={report.id} className="p-5 border-none shadow-sm rounded-2xl bg-white space-y-4">
+              <div key={report.id} className="w-full max-w-full overflow-hidden p-4 border-none shadow-sm rounded-2xl bg-white space-y-4">
                 <div className="flex justify-between items-start gap-4">
-                  <div className="space-y-1">
-                    <h4 className="font-black uppercase tracking-tight text-slate-900 leading-tight">{report.title}</h4>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{report.type}</p>
+                  <div className="space-y-1 min-w-0 flex-1">
+                    <h4 className="font-black uppercase tracking-tight text-slate-900 leading-tight break-words">{report.title}</h4>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground break-words">{report.type}</p>
                   </div>
-                  <StatusBadge status={report.status} />
+                  <StatusBadge status={report.status} className="shrink-0" />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4 py-3 border-y border-slate-50">
-                  <div className="space-y-1">
+                  <div className="space-y-1 min-w-0">
                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Location</p>
-                    <p className="text-xs font-bold text-slate-700">{report.location}</p>
+                    <p className="text-xs font-bold text-slate-700 break-words">{report.location}</p>
                   </div>
                   <div className="space-y-1 text-right">
                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Date</p>
@@ -434,12 +436,12 @@ export default function MyReports() {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {report.status === 'Deleted' ? (
                     <>
                       <Button
                         variant="outline"
-                        className="flex-1 font-black uppercase text-[10px] tracking-widest py-5 rounded-xl border-slate-100 hover:bg-green-50 hover:text-green-700"
+                        className="w-full font-black uppercase text-[10px] tracking-widest py-5 rounded-xl border-slate-100 hover:bg-green-50 hover:text-green-700"
                         onClick={() => handleRestore(report.id)}
                       >
                         <RotateCcw className="mr-2 h-3 w-3" />
@@ -447,7 +449,7 @@ export default function MyReports() {
                       </Button>
                       <Button
                         variant="outline"
-                        className="flex-1 font-black uppercase text-[10px] tracking-widest py-5 rounded-xl border-red-100 text-red-600 hover:bg-red-50"
+                        className="w-full font-black uppercase text-[10px] tracking-widest py-5 rounded-xl border-red-100 text-red-600 hover:bg-red-50"
                         onClick={() => handlePermDelete(report.id, report.title)}
                       >
                         <Trash2 className="mr-2 h-3 w-3" />
@@ -458,7 +460,7 @@ export default function MyReports() {
                     <>
                       <Button 
                         variant="outline" 
-                        className="flex-1 font-black uppercase text-[10px] tracking-widest py-5 rounded-xl border-slate-100"
+                        className="w-full font-black uppercase text-[10px] tracking-widest py-5 rounded-xl border-slate-100"
                         onClick={() => navigate(`/share/${report.id}`)}
                       >
                         <Eye className="mr-2 h-3 w-3" />
@@ -466,7 +468,7 @@ export default function MyReports() {
                       </Button>
                       <Button 
                         variant="outline" 
-                        className="flex-1 font-black uppercase text-[10px] tracking-widest py-5 rounded-xl border-slate-100 hover:bg-sitk-yellow hover:border-sitk-yellow"
+                        className="w-full font-black uppercase text-[10px] tracking-widest py-5 rounded-xl border-slate-100 hover:bg-sitk-yellow hover:border-sitk-yellow"
                         onClick={() => exportSavedReportToPDF(report as any, branding)}
                       >
                         <FileText className="mr-2 h-3 w-3" />
@@ -474,7 +476,7 @@ export default function MyReports() {
                       </Button>
                       <Button
                         variant="outline"
-                        className="font-black uppercase text-[10px] tracking-widest py-5 px-4 rounded-xl border-red-100 text-red-500 hover:bg-red-50"
+                        className="w-full sm:col-span-2 font-black uppercase text-[10px] tracking-widest py-5 px-4 rounded-xl border-red-100 text-red-500 hover:bg-red-50"
                         onClick={() => handleSoftDelete(report.id, report.title)}
                       >
                         <Trash2 className="h-3 w-3" />
