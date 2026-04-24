@@ -14,9 +14,8 @@ import {
   AlertTriangle,
   FileSearch
 } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import SectionHeader from '@/components/SectionHeader';
+import { cn } from '@/lib/utils';
 
 interface Template {
   id: string;
@@ -36,6 +35,7 @@ export default function ModuleSelectionPage() {
         title: 'Risk Assessments',
         description: 'Identify hazards and implement control measures',
         icon: ShieldAlert,
+          colors: { headerBg: 'bg-amber-100', iconText: 'text-amber-800', countBg: 'bg-amber-50', itemIconBg: 'bg-amber-50', itemIconHover: 'group-hover:bg-amber-100', itemIconText: 'text-amber-600', itemIconTextHover: 'group-hover:text-amber-900' },
         templates: [
           { id: 'dynamic-ra', title: 'Dynamic Risk Assessment', description: 'On-the-spot assessment for changing site conditions.', icon: AlertTriangle },
           { id: 'manual-handling', title: 'Manual Handling Operations Assessment', description: 'L.I.T.E. based assessment to identify and control manual handling risks.', icon: Box },
@@ -49,6 +49,7 @@ export default function ModuleSelectionPage() {
         title: 'Fire Safety',
         description: 'Manage fire prevention and emergency procedures',
         icon: Flame,
+          colors: { headerBg: 'bg-red-100', iconText: 'text-red-800', countBg: 'bg-red-50', itemIconBg: 'bg-red-50', itemIconHover: 'group-hover:bg-red-100', itemIconText: 'text-red-600', itemIconTextHover: 'group-hover:text-red-900' },
         templates: [
           { id: 'fire-briefing', title: 'Fire Briefing', description: 'Record of fire safety induction for new staff.', icon: Flame },
           { id: 'fire-drill', title: 'Fire Drill Evacuation Report', description: 'Log and evaluate site evacuation drills.', icon: Flame },
@@ -61,10 +62,9 @@ export default function ModuleSelectionPage() {
         title: 'Permit to Work',
         description: 'Authorisation for high-risk activities',
         icon: FileText,
+          colors: { headerBg: 'bg-purple-100', iconText: 'text-purple-800', countBg: 'bg-purple-50', itemIconBg: 'bg-purple-50', itemIconHover: 'group-hover:bg-purple-100', itemIconText: 'text-purple-600', itemIconTextHover: 'group-hover:text-purple-900' },
         templates: [
-          { id: 'permit-multi', title: 'Permit to Work MULTI GENERAL', description: 'Consolidated permit for various high-risk tasks including Hot Works, Confined Space, and more.', icon: FileText },
-          { id: 'permit-hot', title: 'Hot Works Permit', description: 'Specific authorisation for welding and cutting.', icon: Flame },
-          { id: 'permit-confined', title: 'Confined Space Permit', description: 'Entry authorisation for restricted areas.', icon: HardHat }
+          { id: 'permit-multi', title: 'Permit to Work MULTI GENERAL', description: 'Consolidated permit for various high-risk tasks including Hot Works, Confined Space, and more.', icon: FileText }
         ]
       };
     }
@@ -73,11 +73,10 @@ export default function ModuleSelectionPage() {
         title: 'Checklists',
         description: 'Daily and weekly site safety inspections',
         icon: ClipboardCheck,
+          colors: { headerBg: 'bg-green-100', iconText: 'text-green-800', countBg: 'bg-green-50', itemIconBg: 'bg-green-50', itemIconHover: 'group-hover:bg-green-100', itemIconText: 'text-green-600', itemIconTextHover: 'group-hover:text-green-900' },
         templates: [
-          { id: 'temp-dse-checklist', title: 'Computer DSE Checklist', description: 'Assess office workstation ergonomics.', icon: ClipboardCheck },
-          { id: 'temp-construction-site', title: 'Construction Site Checklist', description: 'General site compliance inspection.', icon: HardHat },
-          { id: 'temp-lone-worker', title: 'Lone Worker Checklist', description: 'Safety verification for staff working alone.', icon: User },
-          { id: 'temp-manual-handling', title: 'Manual Handling Checklist', description: 'Task-specific lifting assessment.', icon: Users },
+          { id: 'temp-site-safety', title: 'Daily Site Safety Inspection', description: 'Daily site safety inspection checklist.', icon: ClipboardCheck },
+          { id: 'temp-construction-site', title: 'Site Induction Checklist', description: 'Construction site worker induction record.', icon: HardHat },
           { id: 'temp-general-hs', title: 'General H&S Checklist', description: 'Standard workplace safety audit.', icon: ClipboardCheck }
         ]
       };
@@ -87,6 +86,7 @@ export default function ModuleSelectionPage() {
         title: 'Audits',
         description: 'Full site compliance audits and scoring',
         icon: BarChart3,
+          colors: { headerBg: 'bg-blue-100', iconText: 'text-blue-800', countBg: 'bg-blue-50', itemIconBg: 'bg-blue-50', itemIconHover: 'group-hover:bg-blue-100', itemIconText: 'text-blue-600', itemIconTextHover: 'group-hover:text-blue-900' },
         templates: [
           { id: 'audit-mini', title: 'H&S Mini Audit Inspection', description: 'Quick health and safety compliance audit.', icon: BarChart3 },
           { id: 'audit-hs-form', title: 'H&S Audit Form', description: 'Comprehensive health and safety compliance audit.', icon: BarChart3 },
@@ -99,6 +99,7 @@ export default function ModuleSelectionPage() {
         title: 'Incident Reports',
         description: 'Record and investigate site accidents and near misses',
         icon: ShieldAlert,
+          colors: { headerBg: 'bg-orange-100', iconText: 'text-orange-800', countBg: 'bg-orange-50', itemIconBg: 'bg-orange-50', itemIconHover: 'group-hover:bg-orange-100', itemIconText: 'text-orange-600', itemIconTextHover: 'group-hover:text-orange-900' },
         templates: [
           { id: 'incident-report', title: 'Standard Incident Report', description: 'Quickly record an accident or near miss as it happens.', icon: AlertTriangle },
           { id: 'incident-investigation', title: 'Accident / Incident Investigation', description: 'Full investigation form for supervisors and managers.', icon: FileSearch }
@@ -110,6 +111,7 @@ export default function ModuleSelectionPage() {
         title: 'Premises / Equipment / Workplace Checks',
         description: 'Regular inspections for workplace premises and equipment safety',
         icon: ClipboardCheck,
+          colors: { headerBg: 'bg-teal-100', iconText: 'text-teal-800', countBg: 'bg-teal-50', itemIconBg: 'bg-teal-50', itemIconHover: 'group-hover:bg-teal-100', itemIconText: 'text-teal-600', itemIconTextHover: 'group-hover:text-teal-900' },
         templates: [
           { id: '5-001', title: '5-001 Monthly Premises H&S Checklist', description: 'Monthly workplace health and safety checks for premises, staff issues, fire safety, equipment, waste, and corrective actions.', icon: ClipboardCheck },
           { id: '5-002', title: '5-002 Six-Monthly Premises H&S Checklist', description: 'Six-monthly compliance and premises checks including fire drills, contractor servicing, risk assessments, COSHH, LOLER, ladders, and corrective actions.', icon: ClipboardCheck },
@@ -133,56 +135,85 @@ export default function ModuleSelectionPage() {
     );
   }
 
+  const handleStart = (template: Template) => {
+    if (template.id === 'temp-construction-site') navigate('/checklists/site-induction/new');
+    else if (template.id === 'audit-mini') navigate('/audits/mini-audit/new');
+    else if (template.id === '5-001') navigate('/premises-checks/5-001/new');
+    else if (template.id === '5-002') navigate('/premises-checks/5-002/new');
+    else if (template.id === '5-003') navigate('/premises-checks/5-003/new');
+    else if (template.id === '5-004') navigate('/premises-checks/5-004/new');
+    else if (template.id === '5-017') navigate('/premises-checks/5-017/new');
+    else if (template.id === 'permit-multi') navigate('/permits/multi-general/new');
+    else if (template.id === 'dynamic-ra') navigate('/risk-assessments/new');
+    else if (template.id === 'manual-handling') navigate('/risk-assessments/manual-handling/new');
+    else if (template.id === 'lone-working') navigate('/risk-assessments/lone-working/new');
+    else if (template.id === 'dse-assessment') navigate('/risk-assessments/dse/new');
+    else if (path.includes('checklists')) navigate(`/checklists/new?templateId=${template.id}`);
+    else if (path.includes('audits')) navigate(`/audits/new?templateId=${template.id}`);
+    else if (template.id === 'incident-investigation') navigate('/incidents/investigation/new');
+    else if (template.id === 'incident-report') navigate('/incidents/new');
+    else if (template.id === 'fire-drill') navigate('/fire-safety/drill/new');
+    else if (template.id === 'fire-warden') navigate('/fire-safety/warden-checklist/new');
+    else navigate(`${path}/new?template=${template.id}`);
+  };
+
+  const buttonLabel = path.includes('premises-checks') ? 'Start Form' : 'Start';
+
   return (
     <div className="space-y-6 md:space-y-8 pb-10">
-      <SectionHeader 
-        title={config.title} 
-        icon={config.icon} 
-        description={config.description} 
-      />
+      {/* Category header */}
+      <div className="flex items-center gap-4 pb-2">
+         <div className={cn("p-3 rounded-2xl shadow-sm", config.colors.headerBg)}>
+        <config.icon className={cn("w-5 h-5", config.colors.iconText)} />
+        </div>
+        <div>
+          <h1 className="text-xl font-black uppercase tracking-tight text-slate-900">{config.title}</h1>
+          <p className="text-xs text-slate-500 font-medium mt-0.5">{config.description}</p>
+        </div>
+      </div>
 
-      <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr items-stretch">
-        {config.templates.map((template) => (
-          <Card key={template.id} className="h-full border border-slate-200/80 shadow-sm hover:shadow-md transition-all group bg-white">
-            <CardHeader className="pb-4">
-              <div className="bg-sitk-yellow/10 p-3 rounded-xl w-fit mb-4 group-hover:bg-sitk-yellow transition-colors">
-                <template.icon className="w-6 h-6 text-sitk-black" />
+      {/* Template list */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className={cn("px-5 py-3 border-b border-slate-100", config.colors.countBg)}>
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+            {config.templates.length} {config.templates.length === 1 ? 'template' : 'templates'} available
+          </p>
+        </div>
+
+        <ul className="divide-y divide-slate-100">
+          {config.templates.map((template) => (
+            <li
+              key={template.id}
+              className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors group cursor-pointer"
+              onClick={() => handleStart(template)}
+            >
+              {/* Icon */}
+              <div className={cn("shrink-0 p-2.5 rounded-xl transition-colors", config.colors.itemIconBg, config.colors.itemIconHover)}>
+                <template.icon className={cn("w-4 h-4 transition-colors", config.colors.itemIconText, config.colors.itemIconTextHover)} />
               </div>
-              <CardTitle className="text-lg font-black uppercase tracking-tight">{template.title}</CardTitle>
-              <CardDescription className="text-xs font-medium leading-relaxed">
-                {template.description}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="mt-auto">
-              <Button 
-                className="w-full bg-sitk-black text-white hover:bg-slate-800 font-black uppercase text-[10px] tracking-widest py-6"
-                onClick={() => {
-                  if (template.id === 'temp-construction-site') navigate('/checklists/site-induction/new');
-                  else if (template.id === 'audit-mini') navigate('/audits/mini-audit/new');
-                  else if (template.id === '5-001') navigate('/premises-checks/5-001/new');
-                  else if (template.id === '5-002') navigate('/premises-checks/5-002/new');
-                  else if (template.id === '5-003') navigate('/premises-checks/5-003/new');
-                  else if (template.id === '5-004') navigate('/premises-checks/5-004/new');
-                  else if (template.id === '5-017') navigate('/premises-checks/5-017/new');
-                  else if (template.id === 'permit-multi') navigate('/permits/multi-general/new');
-                  else if (template.id === 'dynamic-ra') navigate('/risk-assessments/new');
-                  else if (template.id === 'manual-handling') navigate('/risk-assessments/manual-handling/new');
-                  else if (template.id === 'lone-working') navigate('/risk-assessments/lone-working/new');
-                  else if (template.id === 'dse-assessment') navigate('/risk-assessments/dse/new');
-                  else if (path.includes('checklists')) navigate(`/checklists/new?template=${template.id}`);
-                  else if (path.includes('audits')) navigate(`/audits/new?template=${template.id}`);
-                  else if (template.id === 'incident-investigation') navigate('/incidents/investigation/new');
-                  else if (template.id === 'incident-report') navigate('/incidents/new');
-                  else if (template.id === 'fire-drill') navigate('/fire-safety/drill/new');
-                  else if (template.id === 'fire-warden') navigate('/fire-safety/warden-checklist/new');
-                  else navigate(`${path}/new?template=${template.id}`);
-                }}
+
+              {/* Title + description */}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-slate-800 truncate group-hover:text-sitk-black transition-colors">
+                  {template.title}
+                </p>
+                <p className="text-[11px] text-slate-400 font-medium leading-snug mt-0.5 line-clamp-1">
+                  {template.description}
+                </p>
+              </div>
+
+              {/* Action */}
+              <Button
+                size="sm"
+                className="shrink-0 bg-sitk-black text-white hover:bg-slate-700 font-black uppercase text-[9px] tracking-widest px-4 py-2 rounded-xl"
+                onClick={(e) => { e.stopPropagation(); handleStart(template); }}
               >
-                {path.includes('premises-checks') ? 'Start Form' : 'Start Report'} <ArrowRight className="ml-2 w-4 h-4" />
+                {buttonLabel}
+                <ArrowRight className="ml-1.5 w-3 h-3" />
               </Button>
-            </CardContent>
-          </Card>
-        ))}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

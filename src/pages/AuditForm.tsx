@@ -164,7 +164,7 @@ export default function AuditForm() {
   const overallScore = calculateOverallScore();
 
   return (
-    <div className="space-y-7 md:space-y-8 pb-24 md:pb-12 max-w-4xl mx-auto px-1 sm:px-0">
+    <div className="space-y-7 md:space-y-8 pb-24 md:pb-12 max-w-[1200px] mx-auto px-1 sm:px-0">
       <div className="sticky top-2 md:top-3 z-30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 rounded-xl border border-slate-200/80 bg-white/95 backdrop-blur px-3 py-2 shadow-sm">
         <Button 
           variant="ghost" 

@@ -12,7 +12,8 @@ export default function StatusBadge({ status, className }: StatusBadgeProps) {
     'Draft': 'bg-yellow-50 text-yellow-700 border-yellow-200',
     'Submitted': 'bg-blue-50 text-blue-600 border-blue-100',
     'Completed': 'bg-green-50 text-green-600 border-green-100',
-  };
+      'Deleted': 'bg-slate-50 text-slate-400 border-slate-200',
+    };
 
   return (
     <Badge 

@@ -214,7 +214,7 @@ export default function DynamicRiskAssessmentForm() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-7 md:space-y-8 pb-24 md:pb-12 px-1 sm:px-0" id="dra-report">
+    <div className="max-w-[1200px] mx-auto space-y-7 md:space-y-8 pb-24 md:pb-12 px-1 sm:px-0" id="dra-report">
       {/* Header Actions */}
       <div className="sticky top-2 md:top-3 z-30 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 rounded-xl border border-slate-200/80 bg-white/95 backdrop-blur px-3 py-2 shadow-sm">
         <div className="flex flex-wrap items-center gap-3 sm:gap-4">

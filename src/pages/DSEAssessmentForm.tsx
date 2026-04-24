@@ -44,6 +44,7 @@ import { useAutoSave, getAutoSavedData } from '../lib/useAutoSave';
 import { usePhotoStore } from '../lib/usePhotoStore';
 import { useBranding, DEFAULT_BRANDING } from '../lib/brandingContext';
 import PhotoUpload from '../components/PhotoUpload';
+import SectionHeader from '../components/SectionHeader';
 import { DSEAssessmentReport, ReportStatus } from '../types';
 
 const USAGE_OPTIONS = {
@@ -467,7 +468,7 @@ export default function DSEAssessmentForm() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 md:space-y-10 pb-24 md:pb-12 px-1 sm:px-4">
+    <div className="max-w-[1200px] mx-auto space-y-8 md:space-y-10 pb-24 md:pb-12 px-1 sm:px-4">
       {/* Header Actions */}
       <div className="sticky top-2 md:top-3 z-30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 rounded-xl border border-slate-200/80 bg-white/95 backdrop-blur px-3 py-2 shadow-sm">
         <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">

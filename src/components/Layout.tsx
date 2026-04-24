@@ -138,7 +138,7 @@ export default function Layout({ children }: LayoutProps) {
           </Sheet>
         </header>
 
-        <main className="flex-1 w-full px-4 sm:px-5 md:px-7 lg:px-8 xl:px-10 py-5 md:py-8 pb-24 md:pb-10 lg:pb-8">
+        <main className="flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-5 md:py-8 pb-24 md:pb-10 lg:pb-16">
           {children}
         </main>
 

@@ -104,7 +104,7 @@ export default function IncidentReportForm() {
   };
 
   return (
-    <div className="space-y-7 md:space-y-8 pb-24 md:pb-12 max-w-3xl mx-auto px-1 sm:px-0" id="incident-report">
+    <div className="space-y-7 md:space-y-8 pb-24 md:pb-12 max-w-[1200px] mx-auto px-1 sm:px-0" id="incident-report">
       <div className="sticky top-2 md:top-3 z-30 flex flex-col md:flex-row md:items-center justify-between gap-6 rounded-xl border border-slate-200/80 bg-white/95 backdrop-blur px-3 py-2 shadow-sm">
         <Button 
           variant="ghost" 

@@ -4,7 +4,6 @@ import {
   ShieldCheck, 
   FileText, 
   Download,
-  FileDown,
   Printer, 
   ArrowLeft,
   AlertTriangle,
@@ -17,7 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { getReportById } from '@/lib/mockData';
-import { exportToPDF, exportSavedReportToWord, printReport, makeReportFileName, formatDateUK } from '@/lib/exportUtils';
+import { exportToPDF, printReport, makeReportFileName, formatDateUK } from '@/lib/exportUtils';
 import { useBranding } from '@/lib/brandingContext';
 import StatusBadge from '@/components/StatusBadge';
 import SectionHeader from '@/components/SectionHeader';
@@ -98,14 +97,6 @@ export default function PublicReportView() {
               className="hidden sm:flex font-black uppercase text-[10px] tracking-widest border-2 border-slate-100 rounded-xl hover:bg-sitk-yellow hover:border-sitk-yellow transition-all"
             >
               <Download className="w-3 h-3 mr-2" /> PDF
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => exportSavedReportToWord(report, branding)}
-              className="hidden sm:flex font-black uppercase text-[10px] tracking-widest border-2 border-slate-100 rounded-xl hover:bg-sitk-yellow hover:border-sitk-yellow transition-all"
-            >
-              <FileDown className="w-3 h-3 mr-2" /> Word
             </Button>
             <Button 
               variant="outline" 
@@ -445,12 +436,6 @@ export default function PublicReportView() {
             onClick={() => exportToPDF('public-report-content', fileName, branding)}
           >
             <Download className="w-4 h-4 mr-2" /> PDF
-          </Button>
-          <Button 
-            className="flex-1 bg-white/10 text-white hover:bg-white/20 font-black uppercase text-[10px] tracking-widest py-6 rounded-xl"
-            onClick={() => exportSavedReportToWord(report, branding)}
-          >
-            <FileDown className="w-4 h-4 mr-2" /> Word
           </Button>
           <Button 
             className="flex-1 bg-white/10 text-white hover:bg-white/20 font-black uppercase text-[10px] tracking-widest py-6 rounded-xl"

@@ -1,7 +1,7 @@
 import React from 'react';
-import { FileText, FileDown, Printer, Save, Send, Share2, Check } from 'lucide-react';
+import { FileText, Printer, Save, Send, Share2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { exportSavedReportToPDF, exportSavedReportToWord, printReport, makeReportFileName } from '@/lib/exportUtils';
+import { exportSavedReportToPDF, printReport, makeReportFileName } from '@/lib/exportUtils';
 import { useBranding } from '@/lib/brandingContext';
 import { cn } from '@/lib/utils';
 import type { PhotoAttachment } from '@/types';
@@ -98,14 +98,6 @@ export default function ExportButtons({
         className="h-12 px-6 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-slate-100 hover:bg-sitk-yellow hover:border-sitk-yellow transition-all"
       >
         <FileText className="w-4 h-4 mr-2" /> PDF
-      </Button>
-
-      <Button 
-        variant="outline"
-        onClick={() => exportSavedReportToWord(reportObj, branding)}
-        className="h-12 px-6 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-slate-100 hover:bg-sitk-yellow hover:border-sitk-yellow transition-all"
-      >
-        <FileDown className="w-4 h-4 mr-2" /> Word
       </Button>
 
       <Button 

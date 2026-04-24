@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Eye, Edit2, FileText, FileDown, Printer, Plus, ListFilter, Trash2, RotateCcw, AlertTriangle } from 'lucide-react';
+import { Search, Eye, Edit2, FileText, Printer, Plus, ListFilter, Trash2, RotateCcw, AlertTriangle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -41,7 +41,7 @@ import {
 import { softDeleteReport, restoreReport, permanentDeleteReport } from '@/lib/mockData';
 import { useAuth } from '@/lib/authContext';
 import { useReports } from '@/lib/useReports';
-import { exportSavedReportToPDF, exportSavedReportToWord } from '@/lib/exportUtils';
+import { exportSavedReportToPDF } from '@/lib/exportUtils';
 import { preloadDraftForEdit } from '@/lib/useAutoSave';
 import { useBranding } from '@/lib/brandingContext';
 import StatusBadge from '@/components/StatusBadge';
@@ -358,19 +358,6 @@ export default function MyReports() {
                                   variant="ghost" 
                                   size="icon" 
                                   className="h-8 w-8 rounded-lg hover:bg-sitk-yellow/20 hover:text-sitk-black"
-                                  onClick={() => exportSavedReportToWord(report as any, branding)}
-                                >
-                                  <FileDown className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>Download Word</TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon" 
-                                  className="h-8 w-8 rounded-lg hover:bg-sitk-yellow/20 hover:text-sitk-black"
                                   onClick={() => handlePrint(report.id)}
                                 >
                                   <Printer className="h-4 w-4" />
@@ -484,14 +471,6 @@ export default function MyReports() {
                       >
                         <FileText className="mr-2 h-3 w-3" />
                         PDF
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        className="flex-1 font-black uppercase text-[10px] tracking-widest py-5 rounded-xl border-slate-100 hover:bg-sitk-yellow hover:border-sitk-yellow"
-                        onClick={() => exportSavedReportToWord(report as any, branding)}
-                      >
-                        <FileDown className="mr-2 h-3 w-3" />
-                        Word
                       </Button>
                       <Button
                         variant="outline"

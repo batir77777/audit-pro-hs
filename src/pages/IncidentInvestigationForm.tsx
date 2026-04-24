@@ -268,7 +268,7 @@ export default function IncidentInvestigationForm() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-7 md:space-y-8 pb-24 md:pb-12 px-1 sm:px-2">
+    <div className="max-w-[1200px] mx-auto space-y-7 md:space-y-8 pb-24 md:pb-12 px-1 sm:px-2">
       {/* Header Actions */}
       <div className="sticky top-2 md:top-3 z-30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 rounded-xl border border-slate-200/80 bg-white/95 backdrop-blur px-3 py-2 shadow-sm">
         <div className="flex items-center gap-3">

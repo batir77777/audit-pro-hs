@@ -35,7 +35,7 @@ export default function ContractorVettingSelection() {
   ];
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
+    <div className="space-y-8 max-w-[1200px] mx-auto">
       <SectionHeader 
         title="Contractor Vetting" 
         icon={User} 

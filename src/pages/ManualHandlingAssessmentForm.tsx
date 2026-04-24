@@ -218,7 +218,7 @@ export default function ManualHandlingAssessmentForm() {
   }, [formData]);
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 pb-24 md:pb-12 px-1 sm:px-2" id="manual-handling-report">
+    <div className="max-w-[1200px] mx-auto space-y-8 pb-24 md:pb-12 px-1 sm:px-2" id="manual-handling-report">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div className="flex items-center gap-4">
           <Button 

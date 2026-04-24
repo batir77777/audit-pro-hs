@@ -285,7 +285,7 @@ export default function PermitToWorkMultiGeneralForm() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 md:space-y-9 pb-24 md:pb-12 px-2 sm:px-3 lg:px-4">
+    <div className="max-w-[1200px] mx-auto space-y-8 md:space-y-9 pb-24 md:pb-12 px-2 sm:px-3 lg:px-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <Button 

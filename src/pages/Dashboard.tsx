@@ -12,7 +12,6 @@ import {
     Activity as ActivityIcon,
     LayoutDashboard,
     Plus,
-    User,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -80,14 +79,11 @@ export default function Dashboard() {
   ];
 
   const quickActions = [
-    { name: 'Start Dynamic Risk Assessment', description: 'Complete a pre-start risk assessment for site tasks.', icon: ShieldAlert, href: '/risk-assessments/new' },
-    { name: 'Report Incident', description: 'Report an accident, near miss, or site incident.', icon: FileText, href: '/incidents/new' },
-    { name: 'Start Checklist', description: 'Daily and weekly site safety inspections.', icon: ClipboardCheck, href: '/checklists/new' },
-    { name: 'Start Audit', description: 'Full site compliance audits and scoring.', icon: BarChart3, href: '/audits/new' },
-    { name: 'Premises / Equipment Checks', description: 'Regular inspections for workplace premises and equipment.', icon: ClipboardCheck, href: '/premises-checks' },
-    { name: 'Contractor Vetting', description: 'Verify and approve external contractors.', icon: User, href: '/contractors' },
-    { name: 'Site Induction', description: 'Complete a construction site induction checklist.', icon: ClipboardCheck, href: '/checklists/site-induction/new' },
-      ];
+    { name: 'Start Risk Assessment', description: 'Identify hazards and implement control measures.', icon: ShieldAlert, href: '/risk-assessments', variant: 'amber' as const },
+    { name: 'Report Incident', description: 'Report an accident, near miss, or site incident.', icon: FileText, href: '/incidents/new', variant: 'orange' as const },
+    { name: 'Start Checklist', description: 'Daily and weekly site safety inspections.', icon: ClipboardCheck, href: '/checklists', variant: 'green' as const },
+    { name: 'Start Audit', description: 'Full site compliance audits and scoring.', icon: BarChart3, href: '/audits', variant: 'blue' as const },
+  ];
 
   return (
     <div className="space-y-7 md:space-y-8">
@@ -165,6 +161,7 @@ export default function Dashboard() {
                 description={action.description}
                 icon={action.icon}
                 to={action.href}
+                 variant={action.variant}
               />
             </motion.div>
           ))}
