@@ -191,13 +191,17 @@ export default function MyReports() {
 
   const filteredReports = reports.filter(report => {
     const q = searchQuery.toLowerCase();
+    const title = String(report.title ?? '').toLowerCase();
+    const location = String(report.location ?? '').toLowerCase();
+    const type = String(report.type ?? '').toLowerCase();
+    const status = String(report.status ?? '').toLowerCase();
     const matchesSearch = !q ||
-      report.title.toLowerCase().includes(q) ||
-      report.location.toLowerCase().includes(q) ||
-      report.type.toLowerCase().includes(q);
-    if (activeTab === 'deleted') return matchesSearch && report.status === 'Deleted';
-    if (activeTab === 'all') return matchesSearch && report.status !== 'Deleted';
-    return matchesSearch && report.status.toLowerCase() === activeTab;
+      title.includes(q) ||
+      location.includes(q) ||
+      type.includes(q);
+    if (activeTab === 'deleted') return matchesSearch && status === 'deleted';
+    if (activeTab === 'all') return matchesSearch && status !== 'deleted';
+    return matchesSearch && status === activeTab;
   });
 
   return (
