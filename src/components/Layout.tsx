@@ -25,9 +25,29 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const path = location.pathname;
   const { currentUser, logout } = useAuth();
   const { status: autoSaveStatus } = useAutoSaveContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+
+  const isFormRoute = path.includes('/new');
+  const formAccentClass = !isFormRoute
+    ? ''
+    : path.includes('/audits')
+      ? 'form-accent-blue'
+      : path.includes('/checklists')
+        ? 'form-accent-green'
+        : path.includes('/fire-safety')
+          ? 'form-accent-red'
+          : path.includes('/permits')
+            ? 'form-accent-purple'
+            : path.includes('/incidents')
+              ? 'form-accent-orange'
+              : path.includes('/premises-checks')
+                ? 'form-accent-teal'
+                : path.includes('/risk-assessments')
+                  ? 'form-accent-amber'
+                  : 'form-accent-amber';
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -49,6 +69,8 @@ export default function Layout({ children }: LayoutProps) {
     navigate('/login');
   };
 
+  const isNavActive = (href: string) => path === href || path.startsWith(`${href}/`);
+
   const avatarUrl = currentUser
     ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(currentUser.name)}`
     : '';
@@ -65,7 +87,7 @@ export default function Layout({ children }: LayoutProps) {
       
       <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
         {navigation.map((item) => {
-          const isActive = location.pathname === item.href;
+          const isActive = isNavActive(item.href);
           return (
             <Link
               key={item.name}
@@ -74,11 +96,11 @@ export default function Layout({ children }: LayoutProps) {
                 "flex items-center gap-3 px-3.5 py-2 rounded-xl text-[11px] font-extrabold uppercase tracking-[0.08em] transition-all duration-200",
                 isActive 
                   ? "bg-sitk-yellow text-sitk-black shadow-md shadow-sitk-yellow/20" 
-                  : "text-white/65 hover:bg-white/10 hover:text-white"
+                  : "text-white/80 hover:bg-white/10 hover:text-white"
               )}
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              <item.icon className={cn("h-4 w-4 shrink-0", isActive ? "text-sitk-black" : "text-white/40")} />
+              <item.icon className={cn("h-4 w-4 shrink-0", isActive ? "text-sitk-black" : "text-white/55")} />
               {item.name}
             </Link>
           );
@@ -138,7 +160,11 @@ export default function Layout({ children }: LayoutProps) {
           </Sheet>
         </header>
 
-        <main className="flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-5 md:py-8 pb-24 md:pb-10 lg:pb-16">
+        <main className={cn(
+          "flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-5 md:py-8 pb-24 md:pb-10 lg:pb-16",
+          isFormRoute && 'form-shell',
+          formAccentClass
+        )}>
           {children}
         </main>
 
@@ -163,14 +189,14 @@ export default function Layout({ children }: LayoutProps) {
         {/* Mobile Bottom Nav (Quick Access) */}
         <nav className="lg:hidden fixed bottom-0 left-0 right-0 flex items-center justify-around p-2 border-t border-slate-200 bg-white/98 backdrop-blur z-40 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
           {navigation.slice(0, 4).map((item) => {
-            const isActive = location.pathname === item.href;
+            const isActive = isNavActive(item.href);
             return (
               <Link
                 key={item.name}
                 to={item.href}
                 className={cn(
                   "flex flex-col items-center gap-1 p-2 rounded-lg transition-colors min-w-14",
-                  isActive ? "text-slate-900 bg-sitk-yellow/25" : "text-slate-500 hover:text-slate-700"
+                  isActive ? "text-slate-900 bg-sitk-yellow/30 ring-1 ring-sitk-yellow/45" : "text-slate-600 hover:text-slate-800"
                 )}
               >
                 <item.icon className="w-5 h-5" />
@@ -182,7 +208,7 @@ export default function Layout({ children }: LayoutProps) {
             to="/my-reports"
             className={cn(
               "flex flex-col items-center gap-1 p-2 rounded-lg transition-colors min-w-14",
-              location.pathname === '/my-reports' ? "text-slate-900 bg-sitk-yellow/25" : "text-slate-500 hover:text-slate-700"
+              isNavActive('/my-reports') ? "text-slate-900 bg-sitk-yellow/30 ring-1 ring-sitk-yellow/45" : "text-slate-600 hover:text-slate-800"
             )}
           >
             <User className="w-5 h-5" />

@@ -2,6 +2,15 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+function normalizeCardTitleContent(children: React.ReactNode): React.ReactNode {
+  if (typeof children !== "string") return children
+
+  return children
+    .replace(/^Section\s+\d+\s*:\s*/i, "")
+    .replace(/^\d+\s*[.)-:]\s*/, "")
+    .trim()
+}
+
 function Card({
   className,
   size = "default",
@@ -34,15 +43,19 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
+  const normalizedChildren = normalizeCardTitleContent(props.children)
+
   return (
     <div
       data-slot="card-title"
       className={cn(
-        "font-heading text-base leading-snug font-medium group-data-[size=sm]/card:text-sm",
+        "font-heading text-base leading-snug font-semibold text-slate-900 group-data-[size=sm]/card:text-sm",
         className
       )}
       {...props}
-    />
+    >
+      {normalizedChildren}
+    </div>
   )
 }
 
@@ -50,7 +63,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-description"
-      className={cn("text-sm text-muted-foreground", className)}
+      className={cn("text-sm text-slate-600", className)}
       {...props}
     />
   )

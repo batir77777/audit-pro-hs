@@ -121,8 +121,8 @@ export default function ChecklistForm() {
   const allAnswered = formData.items.every(item => item.answer !== undefined);
 
   return (
-    <div className="space-y-8 md:space-y-9 pb-24 md:pb-12 max-w-[1200px] mx-auto px-2 sm:px-3 lg:px-4">
-      <div className="sticky top-2 md:top-3 z-30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 rounded-xl border border-slate-200/80 bg-white/95 backdrop-blur px-3 py-2 shadow-sm">
+    <div className="space-y-8 md:space-y-9 pb-24 md:pb-12 max-w-[1200px] mx-auto px-2 sm:px-3 lg:px-4 form-page">
+      <div className="sticky top-2 md:top-3 z-30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 rounded-xl border border-slate-200/80 bg-white/95 backdrop-blur px-3 py-2 shadow-sm form-action-row">
         <Button 
           variant="ghost" 
           size="sm" 
@@ -166,7 +166,7 @@ export default function ChecklistForm() {
       </div>
 
       {/* Header Info */}
-      <Card className="border border-slate-300/80 shadow-[0_6px_18px_rgba(15,23,42,0.06)] rounded-2xl overflow-hidden bg-white">
+      <Card className="border border-slate-300/80 shadow-[0_6px_18px_rgba(15,23,42,0.06)] rounded-2xl overflow-hidden bg-white form-section-block">
         <CardContent className="p-5 md:p-7 space-y-6 md:space-y-7">
           <SectionHeader title="Basic Information" icon={Info} description="Site and completion details" className="mb-0" />
           <div className="grid gap-6 md:grid-cols-3">
@@ -198,7 +198,11 @@ export default function ChecklistForm() {
               <Label className="uppercase text-[10px] font-black tracking-widest text-muted-foreground">Completed By</Label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <Input className="pl-12 py-6 bg-slate-100 border border-slate-300 font-bold" value={formData.personCompleting} disabled />
+                <Input
+                  className="pl-12 py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35 font-bold"
+                  value={formData.personCompleting}
+                  onChange={e => setFormData({...formData, personCompleting: e.target.value})}
+                />
               </div>
             </div>
           </div>
@@ -206,7 +210,7 @@ export default function ChecklistForm() {
       </Card>
 
       {/* Checklist Items */}
-      <div className="space-y-4">
+      <div className="space-y-4 form-section-block">
         <SectionHeader title="Checklist Items" icon={ClipboardCheck} description="Complete all items below" className="px-2" />
         {formData.items.map((item, index) => (
           <motion.div
@@ -216,29 +220,29 @@ export default function ChecklistForm() {
             transition={{ delay: index * 0.05 }}
           >
             <Card className={cn(
-              "border border-slate-300/80 shadow-[0_4px_14px_rgba(15,23,42,0.06)] transition-all rounded-2xl overflow-hidden bg-white",
+              "check-item-card border border-slate-300/80 shadow-[0_4px_14px_rgba(15,23,42,0.06)] transition-all rounded-2xl overflow-hidden bg-white",
               item.answer === 'No' ? "ring-1 ring-red-200 bg-red-50/30" : "bg-white"
             )}>
               <CardContent className="p-4 md:p-6 space-y-4 md:space-y-5">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
                   <div className="flex gap-3 md:gap-4 flex-1">
-                    <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-xs font-black text-slate-400 shrink-0">
+                    <span className="check-item-index w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-xs font-black text-slate-400 shrink-0">
                       {index + 1}
                     </span>
-                    <p className="font-bold text-slate-900 leading-tight pt-1">{item.question}</p>
+                    <p className="check-item-question font-bold text-slate-900 leading-tight pt-1">{item.question}</p>
                   </div>
                   
                   <RadioGroup 
                     value={item.answer} 
                     onValueChange={(val) => handleAnswerChange(item.id, val as ChecklistAnswer)}
-                    className="flex items-center flex-wrap justify-between sm:justify-start gap-1.5 bg-slate-100/70 p-1.5 rounded-xl w-full sm:w-fit"
+                    className="check-answer-group flex items-center flex-wrap justify-between sm:justify-start gap-1.5 bg-slate-100/70 p-1.5 rounded-xl w-full sm:w-fit"
                   >
                     <div className="flex items-center">
                       <RadioGroupItem value="Yes" id={`yes-${item.id}`} className="sr-only" />
                       <Label 
                         htmlFor={`yes-${item.id}`}
                         className={cn(
-                          "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest cursor-pointer transition-all",
+                          "check-answer-chip px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest cursor-pointer transition-all",
                           item.answer === 'Yes' ? "bg-green-600 text-white shadow-md" : "text-slate-500 hover:bg-slate-200"
                         )}
                       >
@@ -250,7 +254,7 @@ export default function ChecklistForm() {
                       <Label 
                         htmlFor={`no-${item.id}`}
                         className={cn(
-                          "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest cursor-pointer transition-all",
+                          "check-answer-chip px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest cursor-pointer transition-all",
                           item.answer === 'No' ? "bg-red-600 text-white shadow-md" : "text-slate-500 hover:bg-slate-200"
                         )}
                       >
@@ -262,7 +266,7 @@ export default function ChecklistForm() {
                       <Label 
                         htmlFor={`na-${item.id}`}
                         className={cn(
-                          "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest cursor-pointer transition-all",
+                          "check-answer-chip px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest cursor-pointer transition-all",
                           item.answer === 'N/A' ? "bg-slate-400 text-white shadow-md" : "text-slate-500 hover:bg-slate-200"
                         )}
                       >
@@ -288,7 +292,7 @@ export default function ChecklistForm() {
       </div>
 
       {/* Overall Comments */}
-      <Card className="border border-slate-300/80 shadow-[0_6px_18px_rgba(15,23,42,0.06)] rounded-2xl overflow-hidden bg-white">
+      <Card className="border border-slate-300/80 shadow-[0_6px_18px_rgba(15,23,42,0.06)] rounded-2xl overflow-hidden bg-white form-section-block">
         <CardContent className="p-5 md:p-7 space-y-5 md:space-y-6">
           <SectionHeader title="Executive Summary" icon={FileText} description="Overall comments and professional assessment observations" className="mb-0" />
           <Textarea 

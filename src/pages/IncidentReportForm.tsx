@@ -205,7 +205,11 @@ export default function IncidentReportForm() {
                 <Label className="uppercase text-[10px] font-black tracking-widest text-muted-foreground">Person Reporting</Label>
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input className="pl-12 py-6 bg-slate-100 border border-slate-300 font-bold" value={formData.personReporting} disabled />
+                  <Input
+                    className="pl-12 py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35 font-bold"
+                    value={formData.personReporting}
+                    onChange={e => setFormData({...formData, personReporting: e.target.value})}
+                  />
                 </div>
               </div>
 
@@ -272,12 +276,8 @@ export default function IncidentReportForm() {
           {/* Evidence Section */}
           <section className="space-y-6">
             <SectionHeader title="Evidence" icon={Camera} description="Supporting photos or documents" className="mb-0" />
-            <div className="border-2 border-dashed border-slate-200 rounded-2xl p-12 flex flex-col items-center justify-center text-slate-400 bg-slate-50/50 hover:bg-slate-50 hover:border-sitk-yellow/50 transition-all cursor-pointer group">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4 group-hover:scale-110 transition-transform">
-                <Camera className="w-8 h-8 text-slate-300 group-hover:text-sitk-yellow transition-colors" />
-              </div>
-              <span className="text-[10px] font-black uppercase tracking-widest">Tap to upload photos</span>
-              <p className="text-[10px] mt-1 opacity-60">JPEG or PNG up to 10MB</p>
+            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm space-y-4">
+              <PhotoUpload photos={photos} onPhotosChange={updatePhotos} label="Evidence Photos" />
             </div>
           </section>
 
@@ -322,11 +322,6 @@ export default function IncidentReportForm() {
           />
         </CardContent>
       </Card>
-
-      {/* Photos Section */}
-      <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm space-y-4">
-        <PhotoUpload photos={photos} onPhotosChange={updatePhotos} />
-      </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-slate-100 p-4 sm:p-6 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] export-hide">
         <div className="max-w-3xl mx-auto flex items-center justify-end gap-3">

@@ -164,8 +164,8 @@ export default function AuditForm() {
   const overallScore = calculateOverallScore();
 
   return (
-    <div className="space-y-7 md:space-y-8 pb-24 md:pb-12 max-w-[1200px] mx-auto px-1 sm:px-0">
-      <div className="sticky top-2 md:top-3 z-30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 rounded-xl border border-slate-200/80 bg-white/95 backdrop-blur px-3 py-2 shadow-sm">
+    <div className="space-y-7 md:space-y-8 pb-24 md:pb-12 max-w-[1200px] mx-auto px-1 sm:px-0 form-page">
+      <div className="sticky top-2 md:top-3 z-30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 rounded-xl border border-slate-200/80 bg-white/95 backdrop-blur px-3 py-2 shadow-sm form-action-row">
         <Button 
           variant="ghost" 
           size="sm" 
@@ -215,7 +215,7 @@ export default function AuditForm() {
       </div>
 
       {/* Audit Meta */}
-      <Card className="border border-slate-200/80 shadow-sm rounded-2xl overflow-hidden bg-white">
+      <Card className="border border-slate-200/80 shadow-sm rounded-2xl overflow-hidden bg-white form-section-block">
         <CardContent className="p-8 space-y-8">
           <SectionHeader title="Audit Information" icon={Info} description="Site and auditor details" className="mb-0" />
           <div className="grid gap-6 md:grid-cols-3">
@@ -247,7 +247,11 @@ export default function AuditForm() {
               <Label className="uppercase text-[10px] font-black tracking-widest text-muted-foreground">Auditor</Label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <Input className="pl-12 py-6 bg-slate-100 border border-slate-300 font-bold" value={formData.auditor} disabled />
+                <Input
+                  className="pl-12 py-6 bg-white border-slate-300 shadow-sm focus-visible:border-sitk-yellow focus-visible:ring-sitk-yellow/35 font-bold"
+                  value={formData.auditor}
+                  onChange={e => setFormData({...formData, auditor: e.target.value})}
+                />
               </div>
             </div>
           </div>
@@ -255,7 +259,7 @@ export default function AuditForm() {
       </Card>
 
       {/* Audit Sections */}
-      <div className="space-y-6">
+      <div className="space-y-6 form-section-block">
         {formData.sections.map((section) => {
           const sectionScore = calculateSectionScore(section);
           const isExpanded = expandedSections[section.id];
@@ -292,22 +296,22 @@ export default function AuditForm() {
                   >
                     {section.items.map((item, idx) => (
                       <Card key={item.id} className={cn(
-                        "border border-slate-300/80 shadow-[0_4px_14px_rgba(15,23,42,0.06)] transition-all rounded-2xl overflow-hidden bg-white",
+                        "check-item-card border border-slate-300/80 shadow-[0_4px_14px_rgba(15,23,42,0.06)] transition-all rounded-2xl overflow-hidden bg-white",
                         item.answer === 'No' ? "ring-1 ring-red-200 bg-red-50/30" : "bg-white"
                       )}>
                         <CardContent className="p-4 md:p-6 space-y-4 md:space-y-5">
                           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
                             <div className="flex gap-3 md:gap-4 flex-1">
-                              <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-xs font-black text-slate-400 shrink-0">
+                              <span className="check-item-index w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-xs font-black text-slate-400 shrink-0">
                                 {idx + 1}
                               </span>
-                              <p className="font-bold text-slate-900 leading-tight pt-1">{item.question}</p>
+                              <p className="check-item-question font-bold text-slate-900 leading-tight pt-1">{item.question}</p>
                             </div>
                             
                             <RadioGroup 
                               value={item.answer} 
                               onValueChange={(val) => handleAnswerChange(section.id, item.id, val as ChecklistAnswer)}
-                              className="flex items-center flex-wrap justify-between sm:justify-start gap-1.5 bg-slate-100/70 p-1.5 rounded-xl w-full sm:w-fit"
+                              className="check-answer-group flex items-center flex-wrap justify-between sm:justify-start gap-1.5 bg-slate-100/70 p-1.5 rounded-xl w-full sm:w-fit"
                             >
                               {['Yes', 'No', 'N/A'].map((opt) => (
                                 <div key={opt} className="flex items-center">
@@ -315,7 +319,7 @@ export default function AuditForm() {
                                   <Label 
                                     htmlFor={`${section.id}-${item.id}-${opt}`}
                                     className={cn(
-                                      "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest cursor-pointer transition-all",
+                                      "check-answer-chip px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest cursor-pointer transition-all",
                                       item.answer === opt 
                                         ? (opt === 'Yes' ? "bg-green-600 text-white shadow-md" : opt === 'No' ? "bg-red-600 text-white shadow-md" : "bg-slate-400 text-white shadow-md")
                                         : "text-slate-500 hover:bg-slate-200"
@@ -349,7 +353,7 @@ export default function AuditForm() {
       </div>
 
       {/* Overall Comments */}
-      <Card className="border border-slate-300/80 shadow-[0_6px_18px_rgba(15,23,42,0.06)] rounded-2xl overflow-hidden bg-white">
+      <Card className="border border-slate-300/80 shadow-[0_6px_18px_rgba(15,23,42,0.06)] rounded-2xl overflow-hidden bg-white form-section-block">
         <CardContent className="p-5 md:p-7 space-y-5 md:space-y-6">
           <SectionHeader title="Executive Summary" icon={FileText} description="Overall audit findings and professional assessment — completed by the assessor" className="mb-0" />
           <Textarea 

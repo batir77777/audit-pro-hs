@@ -563,7 +563,11 @@ export default function ToolboxTalkForm() {
   const { clearAutoSave } = useAutoSave('toolbox_talk', formData);
   React.useEffect(() => {
     const saved = getAutoSavedData<any>('toolbox_talk'); // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (saved) setFormData(prev => ({ ...prev, ...saved }));
+    if (!saved) return;
+    const payload = (saved && typeof saved === 'object' && saved.data && typeof saved.data === 'object')
+      ? saved.data
+      : saved;
+    setFormData(prev => ({ ...prev, ...payload }));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async (status: ReportStatus) => {

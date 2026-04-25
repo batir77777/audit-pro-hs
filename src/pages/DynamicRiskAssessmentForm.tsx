@@ -319,11 +319,19 @@ export default function DynamicRiskAssessmentForm() {
             </div>
             <div className="space-y-2.5">
               <Label className="text-xs font-bold text-slate-700">Person completing this Form</Label>
-              <Input value={formData.personCompleting} disabled className="py-6 bg-slate-100 border-slate-200 font-bold h-12" />
+              <Input
+                value={formData.personCompleting}
+                onChange={e => setFormData({...formData, personCompleting: e.target.value})}
+                className="py-6 bg-slate-50 border-slate-200 focus-visible:ring-sitk-yellow font-bold h-12"
+              />
             </div>
             <div className="space-y-2.5">
               <Label className="text-xs font-bold text-slate-700">Job Title</Label>
-              <Input value={formData.jobTitle} disabled className="py-6 bg-slate-100 border-slate-200 font-bold h-12" />
+              <Input
+                value={formData.jobTitle}
+                onChange={e => setFormData({...formData, jobTitle: e.target.value})}
+                className="py-6 bg-slate-50 border-slate-200 focus-visible:ring-sitk-yellow font-bold h-12"
+              />
             </div>
             <div className="space-y-2.5 md:col-span-2">
               <Label className="text-xs font-bold text-slate-700">Describe the work activity</Label>

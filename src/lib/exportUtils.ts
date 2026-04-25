@@ -4,6 +4,7 @@ import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, Ta
 import { saveAs } from 'file-saver';
 import type { BrandingSettings, PhotoAttachment } from '@/types';
 import { DEFAULT_BRANDING } from '@/lib/brandingContext';
+import { getStoredPhotos, REPORT_TYPE_TO_PHOTO_KEY } from '@/lib/usePhotoStore';
 
 /** Convert a base64 data URL to a Uint8Array for docx ImageRun. */
 function base64ToUint8Array(dataUrl: string): Uint8Array {
@@ -617,7 +618,7 @@ export const exportToWord = async (title: string, data: any, fileName: string, b
   });
 
   // ── Photographs ──────────────────────────────────────────────────────────
-  const wordPhotos: PhotoAttachment[] = Array.isArray(data.photos) ? (data.photos as PhotoAttachment[]) : [];
+  const wordPhotos: PhotoAttachment[] = resolveExportPhotos(data as Record<string, any>);
   if (wordPhotos.length > 0) {
     sections.push(
       new Paragraph({
@@ -899,6 +900,23 @@ function displayVal(v: any): string {
   // Global safeguard: never render raw objects or arrays as strings
   if (Array.isArray(v) || (typeof v === 'object' && v !== null)) return '';
   return String(v);
+}
+
+function hasRenderablePhotoDataUrl(photo: any): boolean {
+  return typeof photo?.dataUrl === 'string' && photo.dataUrl.startsWith('data:image/');
+}
+
+function resolveExportPhotos(source: Record<string, any>): PhotoAttachment[] {
+  const directPhotos: PhotoAttachment[] = Array.isArray(source.photos) ? (source.photos as PhotoAttachment[]) : [];
+  const renderableDirect = directPhotos.filter(hasRenderablePhotoDataUrl);
+  if (renderableDirect.length > 0) return renderableDirect;
+
+  const typeKey = String(source.type ?? '');
+  const photoKey = REPORT_TYPE_TO_PHOTO_KEY[typeKey] ?? '';
+  if (!photoKey) return [];
+
+  const fallback = getStoredPhotos(photoKey).filter(hasRenderablePhotoDataUrl);
+  return fallback;
 }
 
 // ---------------------------------------------------------------------------
@@ -1503,7 +1521,7 @@ export const exportSavedReportToPDF = async (
   flushScalars();
 
   // ── Photographs ───────────────────────────────────────────────────────────
-  const reportPhotos: PhotoAttachment[] = Array.isArray(report.photos) ? (report.photos as PhotoAttachment[]) : [];
+  const reportPhotos: PhotoAttachment[] = resolveExportPhotos(report);
   if (reportPhotos.length > 0) {
     thinRule();
     sectionHeading('Photographs');
