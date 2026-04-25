@@ -47,10 +47,8 @@ function toSupabasePayload(report: Report, organisationId: string | null) {
                       created_by: authorId || null,
                       description: description || null,
           };
-          if (organisationId) {
-                      reportRow.organisation_id = organisationId;
-          }
-          const formPayload = {
+                  reportRow.organisation_id = organisationId;
+                  const formPayload = {
                       ...rest,
                       photos: photos ? photos.map((p: any) => ({ ...p, dataUrl: '' })) : [],
           };
@@ -71,6 +69,10 @@ export async function syncReportToSupabase(report: Report): Promise<{ ok: boolea
         console.log('[syncReport] Session OK. auth.uid():', authUid);
         const orgId = await getMyOrgId();
         console.log('[syncReport] orgId:', orgId);
+                if (!orgId) {
+          console.error('[syncReport] No organisation_id found for user - cannot save report. Check profiles table.');
+          return { ok: false, error: 'no_org_id' };
+        }
         const { reportRow, formPayload } = toSupabasePayload(stripPhotos(report), orgId);
         reportRow.created_by = authUid;
         if (!reportRow.id) { console.error('[syncReport] MISSING report id Ã¢ÂÂ upsert will fail'); return { ok: false, error: 'missing_id' }; }
