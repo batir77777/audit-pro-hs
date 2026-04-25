@@ -416,7 +416,7 @@ export default function DSEAssessmentForm() {
   const { clearAutoSave } = useAutoSave('dse', formData);
   React.useEffect(() => {
     const saved = getAutoSavedData<any>('dse'); // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (saved) setFormData(saved);
+    if (saved) setFormData(prev => ({ ...prev, ...saved }));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async (status: ReportStatus) => {

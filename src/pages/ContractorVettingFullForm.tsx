@@ -154,7 +154,7 @@ export default function ContractorVettingFullForm() {
   const { clearAutoSave } = useAutoSave('contractor_vetting_full', formData);
   React.useEffect(() => {
     const saved = getAutoSavedData<any>('contractor_vetting_full'); // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (saved) setFormData(saved);
+    if (saved) setFormData(prev => ({ ...prev, ...saved }));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async (status: ReportStatus) => {

@@ -142,7 +142,7 @@ export default function SixMonthlyPremisesChecklistForm() {
   const { clearAutoSave } = useAutoSave('six_monthly_premises', formData);
   React.useEffect(() => {
     const saved = getAutoSavedData<any>('six_monthly_premises'); // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (saved) setFormData(saved);
+    if (saved) setFormData(prev => ({ ...prev, ...saved }));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async (status: ReportStatus) => {

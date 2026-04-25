@@ -161,7 +161,7 @@ export default function FireBriefingForm() {
   const { clearAutoSave } = useAutoSave('fire_briefing', formData);
   React.useEffect(() => {
     const saved = getAutoSavedData<any>('fire_briefing'); // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (saved) setFormData(saved);
+    if (saved) setFormData(prev => ({ ...prev, ...saved }));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async (status: ReportStatus) => {

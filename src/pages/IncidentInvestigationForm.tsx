@@ -194,7 +194,7 @@ export default function IncidentInvestigationForm() {
   const { clearAutoSave } = useAutoSave('incident_investigation', formData);
   React.useEffect(() => {
     const saved = getAutoSavedData<any>('incident_investigation'); // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (saved) setFormData(saved);
+    if (saved) setFormData(prev => ({ ...prev, ...saved }));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async (status: 'Draft' | 'Submitted') => {

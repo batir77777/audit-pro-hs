@@ -181,7 +181,7 @@ export default function ConstructionSiteChecklistForm() {
   const { clearAutoSave } = useAutoSave('construction_site', formData);
   React.useEffect(() => {
     const saved = getAutoSavedData<any>('construction_site'); // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (saved) setFormData(saved);
+    if (saved) setFormData(prev => ({ ...prev, ...saved }));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async (status: ReportStatus) => {

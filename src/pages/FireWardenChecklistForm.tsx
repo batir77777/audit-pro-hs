@@ -206,7 +206,7 @@ export default function FireWardenChecklistForm() {
   const { clearAutoSave } = useAutoSave('fire_warden', formData);
   React.useEffect(() => {
     const saved = getAutoSavedData<any>('fire_warden'); // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (saved) setFormData(saved);
+    if (saved) setFormData(prev => ({ ...prev, ...saved }));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async (status: ReportStatus) => {

@@ -237,7 +237,7 @@ export default function PermitToWorkMultiGeneralForm() {
   const { clearAutoSave } = useAutoSave('permit_to_work', formData);
   React.useEffect(() => {
     const saved = getAutoSavedData<any>('permit_to_work'); // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (saved) setFormData(saved);
+    if (saved) setFormData(prev => ({ ...prev, ...saved }));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async (status: ReportStatus) => {

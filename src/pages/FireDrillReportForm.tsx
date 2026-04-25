@@ -151,7 +151,7 @@ export default function FireDrillReportForm() {
   const { clearAutoSave } = useAutoSave('fire_drill', formData);
   React.useEffect(() => {
     const saved = getAutoSavedData<any>('fire_drill'); // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (saved) setFormData(saved);
+    if (saved) setFormData(prev => ({ ...prev, ...saved }));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async (status: ReportStatus) => {

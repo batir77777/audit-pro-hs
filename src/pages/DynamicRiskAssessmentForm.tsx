@@ -172,7 +172,7 @@ export default function DynamicRiskAssessmentForm() {
   const { clearAutoSave } = useAutoSave('dra', formData);
   React.useEffect(() => {
     const saved = getAutoSavedData<any>('dra'); // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (saved) setFormData(saved);
+    if (saved) setFormData(prev => ({ ...prev, ...saved }));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async (status: 'Draft' | 'Submitted') => {
