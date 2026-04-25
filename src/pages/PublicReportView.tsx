@@ -397,7 +397,7 @@ export default function PublicReportView() {
             const reportPhotos = (report.photos as any[] | undefined) ?? storedPhotos;
             if (!reportPhotos || reportPhotos.length === 0) return null;
             return (
-              <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
+              <Card className="border-none shadow-sm rounded-2xl overflow-hidden" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                 <CardContent className="p-6 space-y-5">
                   <SectionHeader title="Photos" icon={Camera} className="mb-0" />
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">

@@ -9,6 +9,7 @@ import {
   Settings, 
   LogOut,
   Menu,
+  Plus,
   User
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -70,6 +71,26 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   const isNavActive = (href: string) => path === href || path.startsWith(`${href}/`);
+
+  const isCreateRoute = [
+    '/new-report',
+    '/risk-assessments',
+    '/incidents',
+    '/checklists',
+    '/audits',
+    '/toolbox-talks',
+    '/fire-safety',
+    '/premises-checks',
+    '/permits',
+    '/contractors',
+  ].some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+
+  const mobileNavigation = [
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, isActive: isNavActive('/dashboard') },
+    { name: 'Create', href: '/new-report', icon: Plus, isActive: isCreateRoute },
+    { name: 'Reports', href: '/my-reports', icon: FileText, isActive: isNavActive('/my-reports') },
+    { name: 'Account', href: '/settings', icon: User, isActive: isNavActive('/settings') },
+  ];
 
   const avatarUrl = currentUser
     ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(currentUser.name)}`
@@ -149,10 +170,11 @@ export default function Layout({ children }: LayoutProps) {
           </div>
           
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-slate-700 hover:bg-slate-100">
-                <Menu className="w-6 h-6" />
-              </Button>
+            <SheetTrigger
+              aria-label="Open menu"
+              className="inline-flex size-8 items-center justify-center rounded-lg text-slate-700 transition-colors hover:bg-slate-100 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 outline-none"
+            >
+              <Menu className="w-6 h-6" />
             </SheetTrigger>
             <SheetContent side="left" className="p-0 w-72 border-r border-slate-200">
               <NavContent />
@@ -170,9 +192,9 @@ export default function Layout({ children }: LayoutProps) {
 
         {/* Autosave floating indicator */}
         {autoSaveStatus !== 'idle' && (
-          <div className="fixed bottom-[5.2rem] right-4 z-50 pointer-events-none lg:bottom-6">
+          <div className="fixed right-3 z-45 pointer-events-none bottom-[calc(env(safe-area-inset-bottom)+5.4rem)] sm:right-4 lg:right-6 lg:bottom-6">
             <div className={cn(
-              "inline-flex min-w-[6.4rem] justify-center items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-md border transition-all duration-300",
+              "inline-flex min-w-[6rem] justify-center items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.12em] shadow-sm border transition-all duration-300",
               autoSaveStatus === 'saving'
                 ? "bg-white text-slate-400 border-slate-100"
                 : "bg-green-50 text-green-600 border-green-100"
@@ -188,32 +210,21 @@ export default function Layout({ children }: LayoutProps) {
 
         {/* Mobile Bottom Nav (Quick Access) */}
         <nav className="lg:hidden fixed bottom-0 left-0 right-0 flex items-center justify-around p-2 border-t border-slate-200 bg-white/98 backdrop-blur z-40 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
-          {navigation.slice(0, 4).map((item) => {
-            const isActive = isNavActive(item.href);
+          {mobileNavigation.map((item) => {
             return (
               <Link
                 key={item.name}
                 to={item.href}
                 className={cn(
                   "flex flex-col items-center gap-1 p-2 rounded-lg transition-colors min-w-14",
-                  isActive ? "text-slate-900 bg-sitk-yellow/30 ring-1 ring-sitk-yellow/45" : "text-slate-600 hover:text-slate-800"
+                  item.isActive ? "text-slate-900 bg-sitk-yellow/30 ring-1 ring-sitk-yellow/45" : "text-slate-600 hover:text-slate-800"
                 )}
               >
                 <item.icon className="w-5 h-5" />
-                <span className="text-[10px] font-medium">{item.name.split(' ')[0]}</span>
+                <span className="text-[10px] font-medium">{item.name}</span>
               </Link>
             );
           })}
-          <Link
-            to="/my-reports"
-            className={cn(
-              "flex flex-col items-center gap-1 p-2 rounded-lg transition-colors min-w-14",
-              isNavActive('/my-reports') ? "text-slate-900 bg-sitk-yellow/30 ring-1 ring-sitk-yellow/45" : "text-slate-600 hover:text-slate-800"
-            )}
-          >
-            <User className="w-5 h-5" />
-            <span className="text-[10px] font-medium">Reports</span>
-          </Link>
         </nav>
       </div>
     </div>

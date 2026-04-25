@@ -625,9 +625,10 @@ export const exportToWord = async (title: string, data: any, fileName: string, b
         children: [new TextRun({ text: 'PHOTOGRAPHS', bold: true, size: 22, color: '1a1a1a', allCaps: true })],
         spacing: { before: 400, after: 120 },
         border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: 'FFDC00', space: 1 } },
+        keepNext: true,
       })
     );
-    sections.push(new Paragraph({ spacing: { after: 120 } }));
+    sections.push(new Paragraph({ spacing: { after: 120 }, keepNext: true }));
 
     // Max dimensions for each photo in a 2-column layout (~A4 content ÷ 2, minus padding)
     const MAX_W_PX = 240;
@@ -705,7 +706,7 @@ export const exportToWord = async (title: string, data: any, fileName: string, b
       sections.push(
         new Table({
           width: { size: 100, type: WidthType.PERCENTAGE },
-          rows: [new TableRow({ children: rowCells })],
+          rows: [new TableRow({ children: rowCells, cantSplit: true })],
           borders: { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder, insideH: noBorder, insideV: noBorder },
         })
       );
@@ -1524,12 +1525,34 @@ export const exportSavedReportToPDF = async (
   const reportPhotos: PhotoAttachment[] = resolveExportPhotos(report);
   if (reportPhotos.length > 0) {
     thinRule();
-    sectionHeading('Photographs');
 
     const PHOTOS_PER_ROW = 2;
     const PHOTO_GAP      = 4;   // mm between columns
     const slotW          = (CONTENT_W - PHOTO_GAP) / PHOTOS_PER_ROW;
     const MAX_PHOTO_H    = 65;  // mm — max height per photo
+
+    // Keep the heading and first photo row together on the same page.
+    // Pre-calculate first row height so we can do a combined space check
+    // before emitting the section heading (which only checks 14mm internally).
+    {
+      const firstRow = reportPhotos.slice(0, PHOTOS_PER_ROW);
+      let firstRowH = MAX_PHOTO_H;
+      try {
+        const heights = firstRow.map(photo => {
+          const props = pdf.getImageProperties(photo.dataUrl);
+          const ar    = props.width / props.height;
+          const h     = slotW / ar;
+          return h > MAX_PHOTO_H ? MAX_PHOTO_H : h;
+        });
+        firstRowH = Math.max(...heights);
+      } catch { /* use default */ }
+      const firstHasCap = firstRow.some(p => !!p.caption);
+      const firstCapH   = firstHasCap ? 7 : 0;
+      const HEADING_H   = 20; // sectionHeading height estimate (bar + text + padding)
+      if (y + HEADING_H + firstRowH + firstCapH + 6 > pageHeight - 16) addPage();
+    }
+
+    sectionHeading('Photographs');
 
     for (let i = 0; i < reportPhotos.length; i += PHOTOS_PER_ROW) {
       const row = reportPhotos.slice(i, i + PHOTOS_PER_ROW);
