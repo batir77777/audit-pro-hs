@@ -26,9 +26,8 @@ function slugify(name: string): string {
 export default function AdminPanel() {
   const { currentUser, authLoading } = useAuth();
 
-  // roleReady: wait for the async fetchOrgId patch to complete.
-  // authLoading goes false before fetchOrgId resolves, so we watch
-  // for the role to settle by giving it up to 2s after auth loads.
+  // roleReady: wait for fetchOrgId to patch the role after authLoading flips false.
+  // authLoading becomes false before the role is resolved, so we need a separate flag.
   const [roleReady, setRoleReady] = useState(false);
 
   const [orgName, setOrgName] = useState('');
@@ -36,27 +35,47 @@ export default function AdminPanel() {
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [createSuccess, setCreateSuccess] = useState(false);
-
   const [orgs, setOrgs] = useState<Organisation[]>([]);
   const [loadingOrgs, setLoadingOrgs] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
+  // Once auth is loaded, wait up to 600ms for role patch, then mark ready.
   useEffect(() => {
     if (authLoading) return;
-    // Once authLoading is false, give fetchOrgId up to 600ms to patch the role.
-    // If role changes to super_admin within that window, roleReady flips immediately.
     const timeout = setTimeout(() => setRoleReady(true), 600);
     return () => clearTimeout(timeout);
   }, [authLoading]);
 
+  // If role resolves to super_admin before timeout, mark ready immediately.
   useEffect(() => {
-    // If role becomes super_admin before the timeout, mark ready immediately.
     if (!authLoading && currentUser?.role === 'super_admin') {
       setRoleReady(true);
     }
   }, [authLoading, currentUser?.role]);
 
-  // Still waiting for auth or role to resolve
+  // Fetch orgs once we confirm super_admin access.
+  useEffect(() => {
+    if (!roleReady || !currentUser || currentUser.role !== 'super_admin') return;
+    const fetchOrgs = async () => {
+      setLoadingOrgs(true);
+      setFetchError(null);
+      const { data, error } = await supabase
+        .from('organisations')
+        .select('id, name, slug, created_at')
+        .order('created_at', { ascending: false });
+      if (error) {
+        setFetchError(error.message);
+      } else {
+        setOrgs(data ?? []);
+      }
+      setLoadingOrgs(false);
+    };
+    fetchOrgs();
+  }, [roleReady]);
+
+  // --- All hooks above this line ---
+
+  // Still waiting for role to resolve
   if (authLoading || !roleReady) return null;
 
   // Redirect non-super_admin users
@@ -69,25 +88,6 @@ export default function AdminPanel() {
     setOrgName(val);
     setOrgSlug(slugify(val));
   };
-
-  const fetchOrgs = async () => {
-    setLoadingOrgs(true);
-    setFetchError(null);
-    const { data, error } = await supabase
-      .from('organisations')
-      .select('id, name, slug, created_at')
-      .order('created_at', { ascending: false });
-    if (error) {
-      setFetchError(error.message);
-    } else {
-      setOrgs(data ?? []);
-    }
-    setLoadingOrgs(false);
-  };
-
-  useEffect(() => {
-    fetchOrgs();
-  }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,7 +104,12 @@ export default function AdminPanel() {
       setCreateSuccess(true);
       setOrgName('');
       setOrgSlug('');
-      fetchOrgs();
+      // Refresh list
+      const { data } = await supabase
+        .from('organisations')
+        .select('id, name, slug, created_at')
+        .order('created_at', { ascending: false });
+      setOrgs(data ?? []);
     }
     setCreating(false);
   };
