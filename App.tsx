@@ -44,6 +44,7 @@ import FireBriefingForm from './pages/FireBriefingForm';
 import FireDrillReportForm from './pages/FireDrillReportForm';
 import FireWardenChecklistForm from './pages/FireWardenChecklistForm';
 import PublicReportView from './pages/PublicReportView';
+import AdminPanel from './pages/AdminPanel';
 
 export default function App() {
   return (
@@ -105,6 +106,8 @@ export default function App() {
         <Route path="/contractors/10-002/new" element={<ProtectedRoute><Layout><ContractorVettingSmallForm /></Layout></ProtectedRoute>} />
         <Route path="/contractors/new" element={<ProtectedRoute><Layout><ContractorVettingFullForm /></Layout></ProtectedRoute>} />
         
+        {/* Admin Route */}
+        <Route path="/admin" element={<ProtectedRoute><Layout><AdminPanel /></Layout></ProtectedRoute>} />
         {/* Public Routes */}
         <Route path="/share/:reportId" element={<PublicReportView />} />
         
