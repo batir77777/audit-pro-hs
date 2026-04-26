@@ -610,9 +610,9 @@ export default function HSMiniAuditForm() {
                 <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Score Key</p>
                 <div className="grid gap-2">
                   {[
-                    { label: '1 = Safe / Yes / Good or N/A', color: 'bg-green-500' },
-                    { label: '0.5 = Some controls in place', color: 'bg-yellow-500' },
-                    { label: '0 = At Risk / No / Very Poor', color: 'bg-red-500' }
+                    { label: 'Yes = Safe / Good', color: 'bg-green-500' },
+                    { label: 'No = At Risk / Poor', color: 'bg-red-500' },
+                    { label: 'N/A = Not Applicable', color: 'bg-slate-400' }
                   ].map((item, i) => (
                     <div key={i} className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/5">
                       <div className={cn("w-2 h-2 rounded-full", item.color)} />
@@ -767,11 +767,10 @@ export default function HSMiniAuditForm() {
                                   </p>
                                 </div>
 
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                   {[
-                                    { label: '1', value: 1, color: 'bg-green-600' },
-                                    { label: '0.5', value: 0.5, color: 'bg-yellow-500' },
-                                    { label: '0', value: 0, color: 'bg-red-600' },
+                                    { label: 'Yes', value: 1, color: 'bg-green-600' },
+                                    { label: 'No', value: 0, color: 'bg-red-600' },
                                     { label: 'N/A', value: 'N/A', color: 'bg-slate-400' }
                                   ].map((opt) => (
                                     <button
@@ -797,7 +796,7 @@ export default function HSMiniAuditForm() {
                                       value={q.comments}
                                       onChange={e => updateQuestion(section.id, q.id, 'comments', e.target.value)}
                                       placeholder="Add details or actions..."
-                                      className="pl-12 bg-white border-slate-100 min-h-[80px] rounded-2xl focus-visible:ring-sitk-yellow transition-all hover:border-slate-200 p-4 resize-none font-bold text-sm shadow-inner"
+                                      className="pl-12 pr-4 py-4 bg-white border-slate-100 min-h-[80px] rounded-2xl focus-visible:ring-sitk-yellow transition-all hover:border-slate-200 resize-none font-bold text-sm shadow-inner"
                                     />
                                   </div>
                                 </div>
@@ -935,28 +934,28 @@ export default function HSMiniAuditForm() {
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col lg:flex-row items-center justify-between p-16 sm:p-20 bg-slate-900 rounded-[5rem] shadow-2xl gap-16 relative overflow-hidden group/footer"
+        className="flex flex-col lg:flex-row items-center justify-between p-8 sm:p-10 bg-slate-900 rounded-[3rem] shadow-2xl gap-8 relative overflow-hidden group/footer"
       >
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,214,0,0.1),transparent)]" />
         <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-sitk-yellow/5 rounded-full blur-3xl" />
         
-        <div className="flex items-center gap-12 relative z-10">
+        <div className="flex items-center gap-6 relative z-10 w-full lg:w-auto justify-center lg:justify-start">
           <div className={cn(
-            "w-32 h-32 rounded-[3.5rem] flex items-center justify-center border-4 shadow-2xl transition-all duration-700",
+            "w-20 h-20 rounded-[2rem] flex items-center justify-center border-2 shadow-2xl transition-all duration-700",
             saveSuccess ? "bg-green-500 border-green-400 rotate-0 shadow-green-500/20" :
             currentStatus === 'Draft' ? "bg-yellow-500 border-yellow-400 rotate-[-6deg] shadow-yellow-500/20" : 
             currentStatus === 'Submitted' ? "bg-blue-500 border-blue-400 rotate-[6deg] shadow-blue-500/20" : "bg-green-500 border-green-400 shadow-green-500/20"
           )}>
             {saveSuccess ? (
-              <CheckCircle2 className="w-16 h-16 text-white" />
+              <CheckCircle2 className="w-10 h-10 text-white" />
             ) : (
-              <Clock className="w-16 h-16 text-white" />
+              <Clock className="w-10 h-10 text-white" />
             )}
           </div>
-          <div className="space-y-5">
-            <p className="text-[12px] font-black text-slate-400 uppercase tracking-[0.6em] leading-none ml-2">Report Status</p>
+          <div className="space-y-2">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] leading-none">Report Status</p>
             <div className={cn(
-              "px-12 py-5 rounded-2xl font-black text-base uppercase tracking-widest shadow-2xl border-2 transition-all duration-500",
+              "px-6 py-3 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-2xl border-2 transition-all duration-500",
               currentStatus === 'Draft' ? "bg-yellow-500/20 border-yellow-500/50 text-yellow-500" : 
               "bg-blue-500/20 border-blue-500/50 text-blue-400"
             )}>
@@ -965,33 +964,33 @@ export default function HSMiniAuditForm() {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-10 w-full lg:w-auto relative z-10">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-5 w-full lg:w-auto relative z-10">
           <Button 
             variant="outline" 
             onClick={() => handleSave('Draft')}
             disabled={isSubmitting}
-            className="w-full sm:w-auto h-28 px-20 rounded-[2.5rem] border-2 border-white/10 bg-white/5 text-white font-black uppercase tracking-[0.4em] text-xs hover:bg-white hover:text-slate-900 hover:border-white transition-all active:scale-95 shadow-2xl group/draft"
+            className="w-full sm:w-auto h-14 px-8 rounded-2xl border-2 border-white/10 bg-white/5 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-white hover:text-slate-900 hover:border-white transition-all active:scale-95 shadow-2xl group/draft"
           >
             {isSubmitting && currentStatus === 'Draft' ? (
               <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
                 <Clock className="h-7 w-7" />
               </motion.div>
             ) : (
-              <Save className="w-7 h-7 mr-6 text-white/40 group-hover/draft:text-slate-900 transition-colors" />
+              <Save className="w-5 h-5 mr-3 text-white/40 group-hover/draft:text-slate-900 transition-colors" />
             )}
             {isSubmitting && currentStatus === 'Draft' ? 'Saving...' : 'Save Draft'}
           </Button>
           <Button 
             onClick={() => handleSave('Submitted')}
             disabled={isSubmitting}
-            className="w-full sm:w-auto h-28 px-24 rounded-[2.5rem] bg-sitk-yellow text-sitk-black font-black uppercase tracking-[0.4em] text-xs hover:bg-white hover:text-sitk-black shadow-2xl shadow-sitk-yellow/20 transition-all active:scale-95 group/submit"
+            className="w-full sm:w-auto h-14 px-9 rounded-2xl bg-sitk-yellow text-sitk-black font-black uppercase tracking-[0.2em] text-[11px] hover:bg-white hover:text-sitk-black shadow-2xl shadow-sitk-yellow/20 transition-all active:scale-95 group/submit"
           >
             {isSubmitting && currentStatus === 'Submitted' ? (
               <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
                 <Clock className="h-7 w-7" />
               </motion.div>
             ) : (
-              <Send className="w-7 h-7 mr-6 group-hover/submit:translate-x-1 group-hover/submit:-translate-y-1 transition-transform" />
+              <Send className="w-5 h-5 mr-3 group-hover/submit:translate-x-1 group-hover/submit:-translate-y-1 transition-transform" />
             )}
             {isSubmitting && currentStatus === 'Submitted' ? 'Submitting...' : 'Submit Audit'}
           </Button>
