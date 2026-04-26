@@ -60,7 +60,7 @@ export default function App() {
         <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
         <Route path="/my-reports" element={<ProtectedRoute><Layout><MyReports /></Layout></ProtectedRoute>} />
         <Route path="/new-report" element={<ProtectedRoute><Layout><NewReportPage /></Layout></ProtectedRoute>} />
-        <Route path="/settings" element={<ProtectedRoute><Layout><Shettings /></Layout></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><Layout><Settings /></Layout></ProtectedRoute>} />
         
         {/* Module Routes */}
         <Route path="/risk-assessments" element={<ProtectedRoute><Layout><ModuleSelectionPage /></Layout></ProtectedRoute>} />
