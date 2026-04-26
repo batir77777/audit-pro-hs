@@ -17,6 +17,16 @@ interface Organisation {
   created_at: string;
 }
 
+interface UserProfile {
+  id: string;
+  full_name: string;
+  email: string;
+  role: string;
+  is_active: boolean;
+  created_at: string;
+  organisations: { id: string; name: string } | null;
+}
+
 function slugify(name: string): string {
   return name
     .toLowerCase()
@@ -26,10 +36,13 @@ function slugify(name: string): string {
     .replace(/-+/g, '-');
 }
 
+function formatRole(role: string): string {
+  return role.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export default function AdminPanel() {
   const { currentUser, authLoading } = useAuth();
 
-  // roleReady: wait for fetchOrgId to patch the role after authLoading flips false.
   const [roleReady, setRoleReady] = useState(false);
 
   // --- Create Organisation state ---
@@ -54,6 +67,11 @@ export default function AdminPanel() {
   const [userCreateError, setUserCreateError] = useState<string | null>(null);
   const [userCreateSuccess, setUserCreateSuccess] = useState(false);
 
+  // --- Users list state ---
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [usersError, setUsersError] = useState<string | null>(null);
+
   // Once auth is loaded, wait up to 600ms for role patch, then mark ready.
   useEffect(() => {
     if (authLoading) return;
@@ -68,9 +86,10 @@ export default function AdminPanel() {
     }
   }, [authLoading, currentUser?.role]);
 
-  // Fetch orgs once we confirm super_admin access.
+  // Fetch orgs and users once super_admin access is confirmed.
   useEffect(() => {
     if (!roleReady || !currentUser || currentUser.role !== 'super_admin') return;
+
     const fetchOrgs = async () => {
       setLoadingOrgs(true);
       setFetchError(null);
@@ -85,15 +104,41 @@ export default function AdminPanel() {
       }
       setLoadingOrgs(false);
     };
+
+    const fetchUsers = async () => {
+      setLoadingUsers(true);
+      setUsersError(null);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          full_name,
+          email,
+          role,
+          is_active,
+          created_at,
+          organisations (
+            id,
+            name
+          )
+        `)
+        .order('created_at', { ascending: true });
+      if (error) {
+        setUsersError(error.message);
+      } else {
+        setUsers((data as UserProfile[]) ?? []);
+      }
+      setLoadingUsers(false);
+    };
+
     fetchOrgs();
+    fetchUsers();
   }, [roleReady]);
 
   // --- All hooks above this line ---
 
-  // Still waiting for role to resolve
   if (authLoading || !roleReady) return null;
 
-  // Redirect non-super_admin users
   if (!currentUser || currentUser.role !== 'super_admin') {
     return <Navigate to="/dashboard" replace />;
   }
@@ -135,7 +180,6 @@ export default function AdminPanel() {
     setUserCreateError(null);
     setUserCreateSuccess(false);
 
-    // Client-side validation
     if (!userFullName.trim()) {
       setUserCreateError('Full name is required.');
       return;
@@ -156,7 +200,6 @@ export default function AdminPanel() {
     setCreatingUser(true);
 
     try {
-      // Get current session JWT — never expose service_role key
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         setUserCreateError('Not authenticated. Please refresh and try again.');
@@ -190,6 +233,23 @@ export default function AdminPanel() {
         setUserPassword('');
         setUserOrgId('');
         setUserRole('client_user');
+        // Refresh users list
+        const { data: refreshed } = await supabase
+          .from('profiles')
+          .select(`
+            id,
+            full_name,
+            email,
+            role,
+            is_active,
+            created_at,
+            organisations (
+              id,
+              name
+            )
+          `)
+          .order('created_at', { ascending: true });
+        setUsers((refreshed as UserProfile[]) ?? []);
       }
     } catch (err: unknown) {
       setUserCreateError(
@@ -199,6 +259,18 @@ export default function AdminPanel() {
 
     setCreatingUser(false);
   };
+
+  // ── Group users by organisation name ──
+  const usersByOrg = users.reduce((acc, user) => {
+    const orgLabel = user.organisations?.name ?? 'No Organisation';
+    if (!acc.has(orgLabel)) acc.set(orgLabel, []);
+    acc.get(orgLabel)!.push(user);
+    return acc;
+  }, new Map<string, UserProfile[]>());
+
+  const sortedOrgGroups = Array.from(usersByOrg.entries()).sort(([a], [b]) =>
+    a.localeCompare(b)
+  );
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 space-y-8">
@@ -385,6 +457,61 @@ export default function AdminPanel() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ── Users ── */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-bold uppercase tracking-widest">
+            Users
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loadingUsers && <p className="text-sm text-slate-500">Loading users...</p>}
+          {usersError && <p className="text-red-600 text-xs font-bold">{usersError}</p>}
+          {!loadingUsers && !usersError && users.length === 0 && (
+            <p className="text-sm text-slate-500">No users found.</p>
+          )}
+          {!loadingUsers && !usersError && sortedOrgGroups.length > 0 && (
+            <div className="space-y-6">
+              {sortedOrgGroups.map(([orgLabel, orgUsers]) => (
+                <div key={orgLabel}>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+                    {orgLabel}
+                  </p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-2 pr-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Name</th>
+                          <th className="text-left py-2 pr-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Email</th>
+                          <th className="text-left py-2 pr-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Role</th>
+                          <th className="text-left py-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">Active</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {orgUsers.map((user) => (
+                          <tr key={user.id} className="border-b last:border-0">
+                            <td className="py-2 pr-3 font-medium whitespace-nowrap">{user.full_name}</td>
+                            <td className="py-2 pr-3 text-slate-500 font-mono text-xs break-all">{user.email}</td>
+                            <td className="py-2 pr-3 text-xs whitespace-nowrap">{formatRole(user.role)}</td>
+                            <td className="py-2 text-xs">
+                              {user.is_active ? (
+                                <span className="text-green-600 font-bold">&#10003;</span>
+                              ) : (
+                                <span className="text-slate-400">&#8211;</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </CardContent>
