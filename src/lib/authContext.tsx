@@ -44,14 +44,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             name: session.user.user_metadata?.name ?? session.user.email ?? '',
             email: session.user.email ?? '',
             organisationId: null,
+            role: 'client_user',
           };
           setCurrentUser(baseUser);
           setAuthLoading(false);
           // Non-blocking: fetch org id and patch currentUser when ready.
-          fetchOrgId(session.user.id).then((organisationId) => {
+          fetchOrgId(session.user.id).then(({ organisationId, role }) => {
             setCurrentUser((prev) =>
               prev && prev.id === session.user.id
-                ? { ...prev, organisationId }
+                ? { ...prev, organisationId, role }
                 : prev
             );
           }).catch(() => {

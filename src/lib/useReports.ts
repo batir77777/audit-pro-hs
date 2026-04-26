@@ -45,7 +45,7 @@ export function useReports(currentUser: AuthUser | null): UseReportsResult {
     setLoading(true);
     setError(null);
     try {
-      const serverReports = await fetchReportsFromSupabase(userId);
+      const serverReports = await fetchReportsFromSupabase(userId, currentUser?.role ?? '');
 
       if (serverReports.length > 0) {
         // Server returned real data — trust it and update cache.

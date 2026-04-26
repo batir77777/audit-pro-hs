@@ -103,18 +103,25 @@ export async function syncReportToSupabase(report: Report): Promise<{ ok: boolea
     }
 }
 
-export async function fetchReportsFromSupabase(userId: string): Promise<Report[]> {
+export async function fetchReportsFromSupabase(userId: string, role: string): Promise<Report[]> {
           try {
                       const { data: { session } } = await supabase.auth.getSession();
                       if (!session) return [];
                       const SELECT_COLS = 'id, title, type, status, location, date, description, created_by, report_data(data)';
                       console.log('[fetchReports] using select:', SELECT_COLS);
-                      const { data, error } = await supabase
-                        .from('reports')
-                        .select(SELECT_COLS)
-                        .eq('created_by', userId)
-                        .neq('status', 'Deleted')
-                        .order('updated_at', { ascending: false })
+const baseQuery = supabase
+                    .from('reports')
+                                        .select(SELECT_COLS)
+                                                            .neq('status', 'Deleted')
+                                                                                .order('updated_at', { ascending: false });
+                                                                                        // Apply role-based query filter
+                                                                                                let finalQuery = baseQuery;
+                                                                                                if (role === 'client_user') {
+                                                                                                  finalQuery = baseQuery.eq('created_by', userId);
+                                                                                                }
+                                                                                                // super_admin: no filter - sees all reports via RLS
+                                                                                                // client_admin: no filter - RLS scopes to their org
+                                                                                                const { data, error } = await finalQuery
                       if (error) { console.warn('[reportService] fetch:', error.message); return []; }
                       return (data || []).map((row: any) => {
                                     const formData = row.report_data?.[0]?.data || {};

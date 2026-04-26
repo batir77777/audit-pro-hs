@@ -24,22 +24,23 @@ export interface AuthUser {
     email: string;
   /** Loaded once at login from the profiles table. Null if no profile row exists. */
   organisationId: string | null;
+  role: string;
 }
 
 /**
  * Fetch organisation_id for a user from their profile row.
  * Returns null on error or if no profile row exists.
  */
-export async function fetchOrgId(userId: string): Promise<string | null> {
+export async function fetchOrgId(userId: string): Promise<{ organisationId: string | null; role: string }> {
   try {
     const { data } = await supabase
       .from('profiles')
-      .select('organisation_id')
+      .select('organisation_id, role')
       .eq('id', userId)
       .single();
-    return data?.organisation_id ?? null;
+        return { organisationId: data?.organisation_id ?? null, role: data?.role ?? 'client_user' };
   } catch {
-    return null;
+        return { organisationId: null, role: 'client_user' };
   }
 }
 
@@ -67,6 +68,7 @@ export function getSession(): AuthUser | null {
                 name: sbUser.user_metadata?.name ?? sbUser.email ?? '',
                 email: sbUser.email ?? '',
                 organisationId: null,
+                role: 'client_user',
         };
   } catch {
         return null;
@@ -117,6 +119,7 @@ export async function signIn(email: string, password: string): Promise<AuthUser>
         name: user.user_metadata?.name ?? user.email ?? '',
         email: user.email ?? '',
         organisationId: null,
+        role: 'client_user',
   };
 }
 
@@ -164,5 +167,6 @@ export async function signUp(
           name: user.user_metadata?.name ?? user.email ?? '',
           email: user.email ?? '',
           organisationId: null,
+          role: 'client_user',
     };
 }
