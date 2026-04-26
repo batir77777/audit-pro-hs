@@ -56,6 +56,12 @@ function toSupabasePayload(report: Report, organisationId: string | null) {
 }
 
 export async function syncReportToSupabase(report: Report): Promise<{ ok: boolean; error?: string }> {
+            // Guard: do not sync reports marked Deleted through the normal save path.
+            // Deleted status is set exclusively by softDeleteReportInSupabase().
+            if (report.status === 'Deleted') {
+                          console.log('[syncReport] Skipping sync for report', report.id, '- status is Deleted. Use softDeleteReportInSupabase() to mark reports as deleted in Supabase.');
+                          return { ok: false, error: 'skipped_deleted' };
+            }
     console.log('[syncReport] FUNCTION CALLED');
     console.log('[syncReport] Starting sync for report:', report.id, 'authorId:', report.authorId);
     try {
@@ -96,7 +102,7 @@ export async function syncReportToSupabase(report: Report): Promise<{ ok: boolea
             throw new Error('report_data upsert: ' + dataError.message + ' (code: ' + dataError.code + ')');
         }
         console.log('[syncReport] SUCCESS synced to Supabase:', reportRow.id);
-        return { ok: true };
+        return { ok: true };h
     } catch (err: any) {
         console.error('[syncReport] CAUGHT ERROR Ã¢ÂÂ message:', err?.message, 'full:', JSON.stringify(err));
         return { ok: false, error: err?.message ?? 'unknown error' };
