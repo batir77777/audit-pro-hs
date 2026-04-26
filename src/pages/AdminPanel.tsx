@@ -7,8 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 
-const EDGE_FUNCTION_URL =
-  'https://fnepfpksgnvcwfcysizc.supabase.co/functions/v1/create-user';
+const EDGE_FUNCTION_URL = 'https://fnepfpksgnvcwfcysizc.supabase.co/functions/v1/create-user';
 
 interface Organisation {
   id: string;
@@ -42,7 +41,6 @@ function formatRole(role: string): string {
 
 export default function AdminPanel() {
   const { currentUser, authLoading } = useAuth();
-
   const [roleReady, setRoleReady] = useState(false);
 
   // --- Create Organisation state ---
@@ -71,6 +69,10 @@ export default function AdminPanel() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [usersError, setUsersError] = useState<string | null>(null);
+
+  // --- Suspend / Activate state ---
+  const [togglingUserId, setTogglingUserId] = useState<string | null>(null);
+  const [toggleError, setToggleError] = useState<Record<string, string>>({});
 
   // Once auth is loaded, wait up to 600ms for role patch, then mark ready.
   useEffect(() => {
@@ -138,10 +140,29 @@ export default function AdminPanel() {
   // --- All hooks above this line ---
 
   if (authLoading || !roleReady) return null;
-
   if (!currentUser || currentUser.role !== 'super_admin') {
     return <Navigate to="/dashboard" replace />;
   }
+
+  // ── Fetch users helper (shared) ──
+  const refreshUsers = async () => {
+    const { data } = await supabase
+      .from('profiles')
+      .select(`
+        id,
+        full_name,
+        email,
+        role,
+        is_active,
+        created_at,
+        organisations (
+          id,
+          name
+        )
+      `)
+      .order('created_at', { ascending: true });
+    setUsers((data as UserProfile[]) ?? []);
+  };
 
   // ── Create Organisation handler ──
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -198,7 +219,6 @@ export default function AdminPanel() {
     }
 
     setCreatingUser(true);
-
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -223,7 +243,6 @@ export default function AdminPanel() {
       });
 
       const result = await response.json();
-
       if (!response.ok) {
         setUserCreateError(result.error ?? 'Failed to create user. Please try again.');
       } else {
@@ -233,31 +252,32 @@ export default function AdminPanel() {
         setUserPassword('');
         setUserOrgId('');
         setUserRole('client_user');
-        // Refresh users list
-        const { data: refreshed } = await supabase
-          .from('profiles')
-          .select(`
-            id,
-            full_name,
-            email,
-            role,
-            is_active,
-            created_at,
-            organisations (
-              id,
-              name
-            )
-          `)
-          .order('created_at', { ascending: true });
-        setUsers((refreshed as UserProfile[]) ?? []);
+        await refreshUsers();
       }
     } catch (err: unknown) {
       setUserCreateError(
         err instanceof Error ? err.message : 'Network error. Please try again.'
       );
     }
-
     setCreatingUser(false);
+  };
+
+  // ── Suspend / Activate handler ──
+  const handleToggleActive = async (user: UserProfile) => {
+    setTogglingUserId(user.id);
+    setToggleError((prev) => ({ ...prev, [user.id]: '' }));
+
+    const { error } = await supabase.rpc('admin_update_profile', {
+      target_id: user.id,
+      new_is_active: !user.is_active,
+    });
+
+    if (error) {
+      setToggleError((prev) => ({ ...prev, [user.id]: error.message }));
+    } else {
+      await refreshUsers();
+    }
+    setTogglingUserId(null);
   };
 
   // ── Group users by organisation name ──
@@ -489,7 +509,8 @@ export default function AdminPanel() {
                           <th className="text-left py-2 pr-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Name</th>
                           <th className="text-left py-2 pr-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Email</th>
                           <th className="text-left py-2 pr-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Role</th>
-                          <th className="text-left py-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">Active</th>
+                          <th className="text-left py-2 pr-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Active</th>
+                          <th className="text-left py-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">Action</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -498,11 +519,36 @@ export default function AdminPanel() {
                             <td className="py-2 pr-3 font-medium whitespace-nowrap">{user.full_name}</td>
                             <td className="py-2 pr-3 text-slate-500 font-mono text-xs break-all">{user.email}</td>
                             <td className="py-2 pr-3 text-xs whitespace-nowrap">{formatRole(user.role)}</td>
-                            <td className="py-2 text-xs">
+                            <td className="py-2 pr-3 text-xs">
                               {user.is_active ? (
                                 <span className="text-green-600 font-bold">&#10003;</span>
                               ) : (
                                 <span className="text-slate-400">&#8211;</span>
+                              )}
+                            </td>
+                            <td className="py-2 text-xs">
+                              {user.role !== 'super_admin' && (
+                                <div>
+                                  <button
+                                    onClick={() => handleToggleActive(user)}
+                                    disabled={togglingUserId === user.id}
+                                    className={
+                                      'text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border ' +
+                                      (user.is_active
+                                        ? 'border-red-300 text-red-600 hover:bg-red-50 disabled:opacity-50'
+                                        : 'border-green-300 text-green-600 hover:bg-green-50 disabled:opacity-50')
+                                    }
+                                  >
+                                    {togglingUserId === user.id
+                                      ? '...'
+                                      : user.is_active
+                                      ? 'Suspend'
+                                      : 'Activate'}
+                                  </button>
+                                  {toggleError[user.id] && (
+                                    <p className="text-red-600 text-[10px] mt-1">{toggleError[user.id]}</p>
+                                  )}
+                                </div>
                               )}
                             </td>
                           </tr>
