@@ -41,12 +41,12 @@ export function useReports(currentUser: AuthUser | null): UseReportsResult {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchAndSet = useCallback(async (userId: string) => {
+  const fetchAndSet = useCallback(async (userId: string, role: string) => {
     setLoading(true);
     setError(null);
     try {
-      const serverReports = await fetchReportsFromSupabase(userId, currentUser?.role ?? '');
-
+      console.log('[useReports] fetching reports as role:', role);
+    const serverReports = await fetchReportsFromSupabase(userId, role);
       if (serverReports.length > 0) {
         // Server returned real data — trust it and update cache.
         setReports(serverReports);
@@ -90,14 +90,14 @@ export function useReports(currentUser: AuthUser | null): UseReportsResult {
       setError(null);
       return;
     }
-    fetchAndSet(currentUser.id);
-    const handleUpdate = () => { fetchAndSet(currentUser.id); };
+    fetchAndSet(currentUser.id, currentUser.role);
+    const handleUpdate = () => { fetchAndSet(currentUser.id, currentUser.role); };
     window.addEventListener('reportsUpdated', handleUpdate);
     return () => window.removeEventListener('reportsUpdated', handleUpdate);
   }, [currentUser, fetchAndSet]);
 
   const reload = useCallback(() => {
-    if (currentUser) fetchAndSet(currentUser.id);
+    if (currentUser) fetchAndSet(currentUser.id, currentUser.role);
   }, [currentUser, fetchAndSet]);
 
   return { reports, loading, error, reload };
