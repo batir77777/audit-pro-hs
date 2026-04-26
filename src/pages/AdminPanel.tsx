@@ -26,6 +26,11 @@ function slugify(name: string): string {
 export default function AdminPanel() {
   const { currentUser, authLoading } = useAuth();
 
+  // roleReady: wait for the async fetchOrgId patch to complete.
+  // authLoading goes false before fetchOrgId resolves, so we watch
+  // for the role to settle by giving it up to 2s after auth loads.
+  const [roleReady, setRoleReady] = useState(false);
+
   const [orgName, setOrgName] = useState('');
   const [orgSlug, setOrgSlug] = useState('');
   const [creating, setCreating] = useState(false);
@@ -36,8 +41,23 @@ export default function AdminPanel() {
   const [loadingOrgs, setLoadingOrgs] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  // Wait for auth to finish loading before deciding access
-  if (authLoading) return null;
+  useEffect(() => {
+    if (authLoading) return;
+    // Once authLoading is false, give fetchOrgId up to 600ms to patch the role.
+    // If role changes to super_admin within that window, roleReady flips immediately.
+    const timeout = setTimeout(() => setRoleReady(true), 600);
+    return () => clearTimeout(timeout);
+  }, [authLoading]);
+
+  useEffect(() => {
+    // If role becomes super_admin before the timeout, mark ready immediately.
+    if (!authLoading && currentUser?.role === 'super_admin') {
+      setRoleReady(true);
+    }
+  }, [authLoading, currentUser?.role]);
+
+  // Still waiting for auth or role to resolve
+  if (authLoading || !roleReady) return null;
 
   // Redirect non-super_admin users
   if (!currentUser || currentUser.role !== 'super_admin') {
