@@ -10,6 +10,8 @@ import { AutoSaveProvider } from './lib/autoSaveContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Login from './pages/Login';
+import ResetPassword from './pages/ResetPassword';
+import UpdatePassword from './pages/UpdatePassword';
 import Dashboard from './pages/Dashboard';
 import MyReports from './pages/MyReports';
 import Settings from './pages/Settings';
@@ -51,12 +53,14 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/update-password" element={<UpdatePassword />} />
         
         {/* Protected Routes */}
         <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
         <Route path="/my-reports" element={<ProtectedRoute><Layout><MyReports /></Layout></ProtectedRoute>} />
         <Route path="/new-report" element={<ProtectedRoute><Layout><NewReportPage /></Layout></ProtectedRoute>} />
-        <Route path="/settings" element={<ProtectedRoute><Layout><Settings /></Layout></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><Layout><Shettings /></Layout></ProtectedRoute>} />
         
         {/* Module Routes */}
         <Route path="/risk-assessments" element={<ProtectedRoute><Layout><ModuleSelectionPage /></Layout></ProtectedRoute>} />
