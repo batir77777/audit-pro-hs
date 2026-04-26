@@ -24,7 +24,7 @@ function slugify(name: string): string {
 }
 
 export default function AdminPanel() {
-  const { currentUser } = useAuth();
+  const { currentUser, authLoading } = useAuth();
 
   const [orgName, setOrgName] = useState('');
   const [orgSlug, setOrgSlug] = useState('');
@@ -36,6 +36,10 @@ export default function AdminPanel() {
   const [loadingOrgs, setLoadingOrgs] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
+  // Wait for auth to finish loading before deciding access
+  if (authLoading) return null;
+
+  // Redirect non-super_admin users
   if (!currentUser || currentUser.role !== 'super_admin') {
     return <Navigate to="/dashboard" replace />;
   }
