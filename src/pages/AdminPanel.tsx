@@ -74,6 +74,12 @@ export default function AdminPanel() {
   const [togglingUserId, setTogglingUserId] = useState<string | null>(null);
   const [toggleError, setToggleError] = useState<Record<string, string>>({});
 
+  // --- Role editing state ---
+  const [editingRole, setEditingRole] = useState<Record<string, 'client_admin' | 'client_user'>>({});
+  const [savingRoleUserId, setSavingRoleUserId] = useState<string | null>(null);
+  const [roleError, setRoleError] = useState<Record<string, string>>({});
+  const [roleSavedUserId, setRoleSavedUserId] = useState<string | null>(null);
+
   // Once auth is loaded, wait up to 600ms for role patch, then mark ready.
   useEffect(() => {
     if (authLoading) return;
@@ -128,7 +134,9 @@ export default function AdminPanel() {
       if (error) {
         setUsersError(error.message);
       } else {
-        setUsers((data as UserProfile[]) ?? []);
+        const list = (data as UserProfile[]) ?? [];
+        setUsers(list);
+        syncEditingRole(list);
       }
       setLoadingUsers(false);
     };
@@ -143,6 +151,17 @@ export default function AdminPanel() {
   if (!currentUser || currentUser.role !== 'super_admin') {
     return <Navigate to="/dashboard" replace />;
   }
+
+  // ── Sync editingRole map from a fresh user list ──
+  const syncEditingRole = (list: UserProfile[]) => {
+    const map: Record<string, 'client_admin' | 'client_user'> = {};
+    list.forEach((u) => {
+      if (u.role !== 'super_admin') {
+        map[u.id] = u.role as 'client_admin' | 'client_user';
+      }
+    });
+    setEditingRole(map);
+  };
 
   // ── Fetch users helper (shared) ──
   const refreshUsers = async () => {
@@ -161,7 +180,9 @@ export default function AdminPanel() {
         )
       `)
       .order('created_at', { ascending: true });
-    setUsers((data as UserProfile[]) ?? []);
+    const list = (data as UserProfile[]) ?? [];
+    setUsers(list);
+    syncEditingRole(list);
   };
 
   // ── Create Organisation handler ──
@@ -278,6 +299,29 @@ export default function AdminPanel() {
       await refreshUsers();
     }
     setTogglingUserId(null);
+  };
+
+  // ── Save Role handler ──
+  const handleSaveRole = async (user: UserProfile) => {
+    const newRole = editingRole[user.id];
+    if (!newRole || newRole === user.role) return;
+
+    setSavingRoleUserId(user.id);
+    setRoleError((prev) => ({ ...prev, [user.id]: '' }));
+
+    const { error } = await supabase.rpc('admin_update_profile', {
+      target_id: user.id,
+      new_role: newRole,
+    });
+
+    if (error) {
+      setRoleError((prev) => ({ ...prev, [user.id]: error.message }));
+    } else {
+      setRoleSavedUserId(user.id);
+      setTimeout(() => setRoleSavedUserId(null), 2000);
+      await refreshUsers();
+    }
+    setSavingRoleUserId(null);
   };
 
   // ── Group users by organisation name ──
@@ -528,26 +572,63 @@ export default function AdminPanel() {
                             </td>
                             <td className="py-2 text-xs">
                               {user.role !== 'super_admin' && (
-                                <div>
-                                  <button
-                                    onClick={() => handleToggleActive(user)}
-                                    disabled={togglingUserId === user.id}
-                                    className={
-                                      'text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border ' +
-                                      (user.is_active
-                                        ? 'border-red-300 text-red-600 hover:bg-red-50 disabled:opacity-50'
-                                        : 'border-green-300 text-green-600 hover:bg-green-50 disabled:opacity-50')
-                                    }
-                                  >
-                                    {togglingUserId === user.id
-                                      ? '...'
-                                      : user.is_active
-                                      ? 'Suspend'
-                                      : 'Activate'}
-                                  </button>
-                                  {toggleError[user.id] && (
-                                    <p className="text-red-600 text-[10px] mt-1">{toggleError[user.id]}</p>
+                                <div className="space-y-1">
+                                  {/* ── Role row ── */}
+                                  <div className="flex items-center gap-1">
+                                    <select
+                                      value={editingRole[user.id] ?? user.role}
+                                      onChange={(e) =>
+                                        setEditingRole((prev) => ({
+                                          ...prev,
+                                          [user.id]: e.target.value as 'client_admin' | 'client_user',
+                                        }))
+                                      }
+                                      disabled={savingRoleUserId === user.id}
+                                      className="text-[10px] rounded border border-input bg-background px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
+                                    >
+                                      <option value="client_user">Client User</option>
+                                      <option value="client_admin">Client Admin</option>
+                                    </select>
+                                    <button
+                                      onClick={() => handleSaveRole(user)}
+                                      disabled={
+                                        savingRoleUserId === user.id ||
+                                        (editingRole[user.id] ?? user.role) === user.role
+                                      }
+                                      className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                                    >
+                                      {savingRoleUserId === user.id
+                                        ? '...'
+                                        : roleSavedUserId === user.id
+                                        ? '\u2713'
+                                        : 'Save'}
+                                    </button>
+                                  </div>
+                                  {roleError[user.id] && (
+                                    <p className="text-red-600 text-[10px]">{roleError[user.id]}</p>
                                   )}
+                                  {/* ── Suspend / Activate row ── */}
+                                  <div>
+                                    <button
+                                      onClick={() => handleToggleActive(user)}
+                                      disabled={togglingUserId === user.id}
+                                      className={
+                                        'text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border ' +
+                                        (user.is_active
+                                          ? 'border-red-300 text-red-600 hover:bg-red-50 disabled:opacity-50'
+                                          : 'border-green-300 text-green-600 hover:bg-green-50 disabled:opacity-50')
+                                      }
+                                    >
+                                      {togglingUserId === user.id
+                                        ? '...'
+                                        : user.is_active
+                                        ? 'Suspend'
+                                        : 'Activate'}
+                                    </button>
+                                    {toggleError[user.id] && (
+                                      <p className="text-red-600 text-[10px] mt-1">{toggleError[user.id]}</p>
+                                    )}
+                                  </div>
                                 </div>
                               )}
                             </td>
